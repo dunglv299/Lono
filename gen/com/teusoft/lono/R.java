@@ -59,21 +59,17 @@ public final class R {
     public static final class id {
         public static final int action_settings=0x7f090009;
         public static final int tv_clock=0x7f090000;
-        public static final int tv_hight=0x7f090003;
+        public static final int tv_hight=0x7f090007;
         public static final int tv_lastupdated=0x7f090001;
-        public static final int tv_low=0x7f090004;
-        public static final int tv_max=0x7f090007;
-        public static final int tv_max_temp=0x7f090008;
-        public static final int tv_min=0x7f090005;
-        public static final int tv_min_temp=0x7f090006;
-        public static final int tv_normal=0x7f090002;
+        public static final int tv_low=0x7f090008;
+        public static final int tv_max=0x7f090004;
+        public static final int tv_max_temp=0x7f090005;
+        public static final int tv_min=0x7f090002;
+        public static final int tv_min_temp=0x7f090003;
+        public static final int tv_normal=0x7f090006;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int bottom_layout=0x7f030001;
-        public static final int clock_layout=0x7f030002;
-        public static final int humidity_layout=0x7f030003;
-        public static final int temp_layout=0x7f030004;
     }
     public static final class menu {
         public static final int main=0x7f080000;

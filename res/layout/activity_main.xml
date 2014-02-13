@@ -18,28 +18,249 @@
             android:src="@drawable/lonometer_logo" />
     </LinearLayout>
 
-    <include
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="25"
-        layout="@layout/clock_layout" />
+        android:background="@color/clock" >
 
-    <include
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/main_icon_marginLeft"
+            android:src="@drawable/my_clock" />
+
+        <TextView
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="22:04:24"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_large" />
+
+        <TextView
+            android:id="@+id/tv_lastupdated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:text="@string/last_updated"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="25"
-        layout="@layout/temp_layout" />
+        android:background="@color/color_temp" >
 
-    <include
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/main_icon_marginLeft"
+            android:src="@drawable/my_temp" />
+
+        <TextView
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="17"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_large" />
+
+        <TextView
+            android:id="@+id/tv_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="2dp"
+            android:text="MIN"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_min_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="30dp"
+            android:layout_toRightOf="@+id/tv_min"
+            android:text="15"
+            android:textColor="@color/white"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/tv_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="2dp"
+            android:text="MAX"
+            android:textColor="@color/white"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/tv_max_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="30dp"
+            android:layout_toLeftOf="@+id/tv_max"
+            android:text="19"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="25"
-        layout="@layout/humidity_layout" />
+        android:background="@color/color_humidity" >
 
-    <include
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/main_icon_marginLeft"
+            android:src="@drawable/my_humidity" />
+
+        <TextView
+            android:id="@+id/tv_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="45%"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_large" />
+
+        <TextView
+            android:id="@+id/tv_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/tv_clock"
+            android:text="NORMAL"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_hight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/tv_normal"
+            android:layout_alignLeft="@+id/tv_normal"
+            android:text="HIGH"
+            android:textColor="@color/color_hight"
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_low"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tv_normal"
+            android:layout_below="@+id/tv_normal"
+            android:text="LOW"
+            android:textColor="@color/color_hight"
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="2dp"
+            android:text="MIN"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_min_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="30dp"
+            android:layout_toRightOf="@+id/tv_min"
+            android:text="45%"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="2dp"
+            android:text="MAX"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_max_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="30dp"
+            android:layout_toLeftOf="@+id/tv_max"
+            android:text="55%"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
+    </RelativeLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="13"
-        layout="@layout/bottom_layout" />
+        android:layout_weight="13" >
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/color_botton_disable"
+            android:text="1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_large" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/color_botton_disable"
+            android:text="2"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_large" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/color_botton_disable"
+            android:text="3"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_large" />
+    </LinearLayout>
 
 </LinearLayout>
