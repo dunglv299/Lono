@@ -25,5 +25,7 @@
     <color name="color_hight">#729D70</color>
     <color name="color_botton_enable">#AAD3AD</color>
     <color name="color_botton_disable">#CCFFCC</color>
+    <color name="gray_light">#D3D3D3</color>
+    <color name="green_text_color">#759ea4</color>
 
 </resources>

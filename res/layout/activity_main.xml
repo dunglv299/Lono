@@ -54,6 +54,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/temp_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="25"
@@ -72,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="17"
+            android:text="17 C"
             android:textColor="@color/white"
             android:textSize="@dimen/main_text_large" />
 
@@ -122,6 +123,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/humidity_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="25"
@@ -220,95 +222,10 @@
             android:textSize="@dimen/main_text_normal" />
     </RelativeLayout>
 
-    <LinearLayout
+    <include
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="13" >
-
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/btn1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/color_botton_disable"
-                android:text="1"
-                android:textColor="@color/white"
-                android:textSize="@dimen/main_text_large" />
-
-            <View
-                android:id="@+id/line_btn1"
-                android:layout_width="50dp"
-                android:layout_height="3dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="15dp"
-                android:background="@color/white"
-                android:visibility="gone" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/white" />
-
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/btn2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/color_botton_disable"
-                android:text="2"
-                android:textColor="@color/white"
-                android:textSize="@dimen/main_text_large" />
-
-            <View
-                android:id="@+id/line_btn2"
-                android:layout_width="50dp"
-                android:layout_height="3dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="15dp"
-                android:background="@color/white"
-                android:visibility="gone" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/white" />
-
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/btn3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/color_botton_disable"
-                android:text="3"
-                android:textColor="@color/white"
-                android:textSize="@dimen/main_text_large" />
-
-            <View
-                android:id="@+id/line_btn3"
-                android:layout_width="50dp"
-                android:layout_height="3dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="15dp"
-                android:background="@color/white"
-                android:visibility="gone" />
-        </RelativeLayout>
-    </LinearLayout>
+        android:layout_weight="13"
+        layout="@layout/bottom_layout" />
 
 </LinearLayout>

@@ -1,14 +1,13 @@
 package com.teusoft.lono.activity;
 
-import java.util.Arrays;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.teusoft.lono.R;
@@ -20,10 +19,16 @@ public class MainActivity extends Activity implements OnClickListener {
 	int[] arrayLineId = { R.id.line_btn1, R.id.line_btn2, R.id.line_btn3 };
 	Button[] arrayButton = new Button[BUTTONS_SIZE];
 	View[] arrayLine = new View[BUTTONS_SIZE];
+	RelativeLayout tempLayout;
+	RelativeLayout humidityLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		initView();
+	}
+
+	private void initView() {
 		setContentView(R.layout.activity_main);
 		setFont();
 		for (int i = 0; i < arrayButton.length; i++) {
@@ -31,6 +36,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			arrayLine[i] = findViewById(arrayLineId[i]);
 			arrayButton[i].setOnClickListener(this);
 		}
+		tempLayout = (RelativeLayout) findViewById(R.id.temp_layout);
+		humidityLayout = (RelativeLayout) findViewById(R.id.humidity_layout);
+		tempLayout.setOnClickListener(this);
+		humidityLayout.setOnClickListener(this);
+		showLine(R.id.btn1);
 	}
 
 	public void setFont() {
@@ -58,15 +68,23 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		showLine(v);
 		switch (v.getId()) {
+		case R.id.temp_layout:
+			goToTemperatureActivity();
+			break;
+		case R.id.humidity_layout:
+			goToHumidityActivity();
+			break;
 		case R.id.btn1:
+			showLine(v.getId());
 			onButton1Press();
 			break;
 		case R.id.btn2:
+			showLine(v.getId());
 			onButton2Press();
 			break;
 		case R.id.btn3:
+			showLine(v.getId());
 			onButton3Press();
 			break;
 		default:
@@ -74,8 +92,20 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	private void showLine(View v) {
-		int index = getIndex(v);
+	private void goToTemperatureActivity() {
+		Intent mIntent = new Intent(this, TemperatureActivity.class);
+		startActivity(mIntent);
+		overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
+	}
+
+	private void goToHumidityActivity() {
+		Intent mIntent = new Intent(this, HumidityActivity.class);
+		startActivity(mIntent);
+		overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
+	}
+
+	private void showLine(int id) {
+		int index = getIndex(id);
 		for (int i = 0; i < arrayButtonId.length; i++) {
 			if (i == index) {
 				arrayLine[i].setVisibility(View.VISIBLE);
@@ -90,9 +120,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	// Get index of button
-	private int getIndex(View v) {
+	private int getIndex(int id) {
 		for (int i = 0; i < arrayButtonId.length; i++) {
-			if (arrayButtonId[i] == v.getId()) {
+			if (arrayButtonId[i] == id) {
 				return i;
 			}
 		}
