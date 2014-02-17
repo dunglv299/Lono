@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="22:04:24"
+            android:text="15:34:10"
             android:textColor="@color/white"
             android:textSize="@dimen/main_text_large" />
 
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="3dp"
             android:text="@string/last_updated"
             android:textColor="@color/white"
             android:textSize="12sp" />
@@ -67,7 +67,7 @@
             android:src="@drawable/my_temp" />
 
         <TextView
-            android:id="@+id/tv_clock"
+            android:id="@+id/tv_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -96,7 +96,18 @@
             android:layout_toRightOf="@+id/tv_min"
             android:text="15"
             android:textColor="@color/white"
-            android:textSize="17sp" />
+            android:textSize="@dimen/main_text_normal" />
+
+        <TextView
+            android:id="@+id/tv_max_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="2dp"
+            android:text="19"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_normal" />
 
         <TextView
             android:id="@+id/tv_max"
@@ -104,19 +115,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="2dp"
+            android:layout_marginRight="50dp"
             android:text="MAX"
-            android:textColor="@color/white"
-            android:textSize="17sp" />
-
-        <TextView
-            android:id="@+id/tv_max_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="30dp"
-            android:layout_toLeftOf="@+id/tv_max"
-            android:text="19"
             android:textColor="@color/white"
             android:textSize="@dimen/main_text_normal" />
     </RelativeLayout>
@@ -135,7 +135,7 @@
             android:src="@drawable/my_humidity" />
 
         <TextView
-            android:id="@+id/tv_clock"
+            android:id="@+id/tv_humidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -150,7 +150,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@+id/tv_clock"
+            android:layout_toRightOf="@+id/tv_humidity"
             android:text="NORMAL"
             android:textColor="@color/white"
             android:textSize="@dimen/main_text_normal" />
@@ -176,7 +176,7 @@
             android:textSize="@dimen/main_text_normal" />
 
         <TextView
-            android:id="@+id/tv_min"
+            android:id="@+id/tv_min2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -187,35 +187,35 @@
             android:textSize="@dimen/main_text_normal" />
 
         <TextView
-            android:id="@+id/tv_min_temp"
+            android:id="@+id/tv_min_humidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="30dp"
-            android:layout_toRightOf="@+id/tv_min"
+            android:layout_toRightOf="@+id/tv_min2"
             android:text="45%"
             android:textColor="@color/white"
             android:textSize="@dimen/main_text_normal" />
 
         <TextView
-            android:id="@+id/tv_max"
+            android:id="@+id/tv_max_humidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="2dp"
-            android:text="MAX"
+            android:text="55%"
             android:textColor="@color/white"
             android:textSize="@dimen/main_text_normal" />
 
         <TextView
-            android:id="@+id/tv_max_temp"
+            android:id="@+id/tv_max2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="30dp"
-            android:layout_toLeftOf="@+id/tv_max"
-            android:text="55%"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"
+            android:text="MAX"
             android:textColor="@color/white"
             android:textSize="@dimen/main_text_normal" />
     </RelativeLayout>
@@ -225,42 +225,90 @@
         android:layout_height="0dp"
         android:layout_weight="13" >
 
-        <Button
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/color_botton_disable"
-            android:text="1"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_large" />
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/btn1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color_botton_disable"
+                android:text="1"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_large" />
+
+            <View
+                android:id="@+id/line_btn1"
+                android:layout_width="50dp"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="@color/white" />
 
-        <Button
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/color_botton_disable"
-            android:text="2"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_large" />
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/btn2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color_botton_disable"
+                android:text="2"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_large" />
+
+            <View
+                android:id="@+id/line_btn2"
+                android:layout_width="50dp"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="@color/white" />
 
-        <Button
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/color_botton_disable"
-            android:text="3"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_large" />
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/btn3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color_botton_disable"
+                android:text="3"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_large" />
+
+            <View
+                android:id="@+id/line_btn3"
+                android:layout_width="50dp"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:visibility="gone" />
+        </RelativeLayout>
     </LinearLayout>
 
 </LinearLayout>
