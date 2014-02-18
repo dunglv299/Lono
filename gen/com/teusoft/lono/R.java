@@ -69,12 +69,13 @@ public final class R {
         public static final int my_temp=0x7f020004;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a0027;
         public static final int bottom_layout=0x7f0a0015;
         public static final int btn1=0x7f0a0021;
         public static final int btn2=0x7f0a0023;
         public static final int btn3=0x7f0a0025;
         public static final int content_layout=0x7f0a0014;
+        public static final int device_address=0x7f0a0028;
+        public static final int device_name=0x7f0a0027;
         public static final int graph_layout=0x7f0a0020;
         public static final int haicham=0x7f0a001a;
         public static final int home_btn=0x7f0a0012;
@@ -84,6 +85,9 @@ public final class R {
         public static final int line_btn1=0x7f0a0022;
         public static final int line_btn2=0x7f0a0024;
         public static final int line_btn3=0x7f0a0026;
+        public static final int menu_refresh=0x7f0a0029;
+        public static final int menu_scan=0x7f0a002a;
+        public static final int menu_stop=0x7f0a002b;
         public static final int temp_layout=0x7f0a0002;
         public static final int tv_average=0x7f0a0019;
         public static final int tv_average_value=0x7f0a001b;
@@ -111,24 +115,45 @@ public final class R {
         public static final int tv_temperature=0x7f0a0013;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
-        public static final int activity_temperature=0x7f030001;
-        public static final int bottom_layout=0x7f030002;
+        public static final int actionbar_indeterminate_progress=0x7f030000;
+        public static final int activity_main=0x7f030001;
+        public static final int activity_temperature=0x7f030002;
+        public static final int bottom_layout=0x7f030003;
+        public static final int listitem_device=0x7f030004;
     }
     public static final class menu {
         public static final int main=0x7f090000;
     }
     public static final class string {
-        public static final int action_settings=0x7f070001;
         public static final int app_name=0x7f070000;
-        public static final int average=0x7f070005;
-        public static final int dew_point=0x7f070006;
-        public static final int hello_world=0x7f070002;
-        public static final int last_updated=0x7f070003;
-        public static final int max=0x7f070009;
-        public static final int min=0x7f070008;
-        public static final int now=0x7f070007;
-        public static final int temperature=0x7f070004;
+        public static final int average=0x7f070004;
+        /**  BLE 
+         */
+        public static final int ble_not_supported=0x7f070009;
+        public static final int connected=0x7f07000e;
+        public static final int dew_point=0x7f070005;
+        public static final int disconnected=0x7f07000f;
+        public static final int error_bluetooth_not_supported=0x7f070011;
+        public static final int hello_world=0x7f070001;
+        public static final int label_data=0x7f07000a;
+        public static final int label_device_address=0x7f07000b;
+        public static final int label_state=0x7f07000c;
+        public static final int last_updated=0x7f070002;
+        public static final int max=0x7f070008;
+        /**  Menu items 
+         */
+        public static final int menu_connect=0x7f070015;
+        public static final int menu_disconnect=0x7f070016;
+        public static final int menu_scan=0x7f070017;
+        public static final int menu_stop=0x7f070018;
+        public static final int min=0x7f070007;
+        public static final int no_data=0x7f07000d;
+        public static final int now=0x7f070006;
+        public static final int temperature=0x7f070003;
+        public static final int title_devices=0x7f070010;
+        public static final int unknown_characteristic=0x7f070013;
+        public static final int unknown_device=0x7f070012;
+        public static final int unknown_service=0x7f070014;
     }
     public static final class style {
         /** 
