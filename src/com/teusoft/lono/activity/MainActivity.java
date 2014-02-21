@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.teusoft.lono.R;
 import com.teusoft.lono.customview.CustomDigitalClock;
 import com.teusoft.lono.service.BluetoothLeService;
 import com.teusoft.lono.service.SampleGattAttributes;
+import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -53,6 +55,11 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView currentHumidityTv;
 	private ArrayList<Integer> listTemperature;
 	private ArrayList<Integer> listHumidity;
+	private Typeface tf;
+	private int channel;
+	private int indexArray;
+	Button connectBtn;
+	private MySharedPreferences sharedPreferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +67,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		initView();
 		initData();
 		mDeviceAddress = getIntent().getStringExtra(EXTRAS_DEVICE_ADDRESS);
+		mDeviceAddress = "D0:FF:50:7B:F8:48";
+
 		Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
 		bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 	}
@@ -67,6 +76,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void initData() {
 		listTemperature = new ArrayList<Integer>();
 		listHumidity = new ArrayList<Integer>();
+		sharedPreferences = new MySharedPreferences(this);
 	}
 
 	private void initView() {
@@ -81,13 +91,15 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		tempLayout = (RelativeLayout) findViewById(R.id.temp_layout);
 		humidityLayout = (RelativeLayout) findViewById(R.id.humidity_layout);
+		connectBtn = (Button) findViewById(R.id.connect_btn);
+		connectBtn.setOnClickListener(this);
 		tempLayout.setOnClickListener(this);
 		humidityLayout.setOnClickListener(this);
 		showLine(R.id.btn1);
 	}
 
 	public void setFont() {
-		Typeface tf = Utils.getTypeface(this);
+		tf = Utils.getTypeface(this);
 		CustomDigitalClock dc = (CustomDigitalClock) findViewById(R.id.tv_clock);
 		dc.setTypeface(tf);
 		((TextView) findViewById(R.id.tv_lastupdated)).setTypeface(tf);
@@ -130,6 +142,17 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.btn3:
 			showLine(v.getId());
 			onButton3Press();
+			break;
+		case R.id.connect_btn:
+			new Handler().postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					mBluetoothLeService.disconnect();
+					Log.e("Disconnected", "Disconnected");
+				}
+			}, 30000);
+			mBluetoothLeService.connect(mDeviceAddress);
 			break;
 		default:
 			break;
@@ -229,15 +252,19 @@ public class MainActivity extends Activity implements OnClickListener {
 				displayGattServices(mBluetoothLeService
 						.getSupportedGattServices());
 			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-				int count = intent.getIntExtra(BluetoothLeService.EXTRA_COUNT,
+				indexArray = intent.getIntExtra(BluetoothLeService.EXTRA_COUNT,
 						0);
 				listTemperature.add(intent.getIntExtra(
 						BluetoothLeService.EXTRA_TEMPERATURE, 0));
 				listHumidity.add(intent.getIntExtra(
 						BluetoothLeService.EXTRA_HUMIDITY, 0));
-				if (count == 1) {
+				channel = intent.getIntExtra(BluetoothLeService.EXTRA_CHANNEL,
+						0);
+				// Log.e("index", indexArray + "");
+				if (indexArray == 1) {
 					displayData();
 				}
+
 			}
 		}
 	};
@@ -270,6 +297,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ " \u2103");
 		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
 				+ " %");
+		Log.e("size", listTemperature.size() + "");
+		currentTempTv.setTypeface(tf);
+		currentHumidityTv.setTypeface(tf);
+		showLine(arrayButtonId[channel - 1]);
+		sharedPreferences.putList(BluetoothLeService.EXTRA_TEMPERATURE,
+				listTemperature);
+		listTemperature = new ArrayList<Integer>();
+
 	}
 
 	private void displayGattServices(List<BluetoothGattService> gattServices) {
