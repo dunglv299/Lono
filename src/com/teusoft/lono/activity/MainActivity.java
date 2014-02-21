@@ -1,8 +1,12 @@
 package com.teusoft.lono.activity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -51,8 +55,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private View[] arrayLine = new View[BUTTONS_SIZE];
 	private RelativeLayout tempLayout;
 	private RelativeLayout humidityLayout;
-	private TextView currentTempTv;
-	private TextView currentHumidityTv;
+	private TextView currentTempTv, currentHumidityTv, minTempTv, maxTempTv,
+			minHumidityTv, maxHumidityTv, lastUpdatedTv;
 	private ArrayList<Integer> listTemperature;
 	private ArrayList<Integer> listHumidity;
 	private Typeface tf;
@@ -60,6 +64,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private int indexArray;
 	Button connectBtn;
 	private MySharedPreferences sharedPreferences;
+	private long lastUpdate;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +88,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 		currentTempTv = (TextView) findViewById(R.id.tv_temp);
 		currentHumidityTv = (TextView) findViewById(R.id.tv_humidity);
+		minTempTv = (TextView) findViewById(R.id.tv_min_temp);
+		maxTempTv = (TextView) findViewById(R.id.tv_max_temp);
+		minHumidityTv = (TextView) findViewById(R.id.tv_min_humidity);
+		maxHumidityTv = (TextView) findViewById(R.id.tv_max_humidity);
+		lastUpdatedTv = (TextView) findViewById(R.id.tv_lastupdated);
 		setFont();
 		for (int i = 0; i < arrayButton.length; i++) {
 			arrayButton[i] = (Button) findViewById(arrayButtonId[i]);
@@ -263,11 +273,47 @@ public class MainActivity extends Activity implements OnClickListener {
 				// Log.e("index", indexArray + "");
 				if (indexArray == 1) {
 					displayData();
+					putDataToSharedPreference();
+				}
+				if (listTemperature.size() >= 288) {
+					putDataToSharedPreference();
+					listTemperature = new ArrayList<Integer>();
 				}
 
 			}
 		}
 	};
+
+	private void displayData() {
+		currentTempTv.setText(listTemperature.get(listTemperature.size() - 1)
+				+ " °C");
+		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
+				+ " %");
+		Log.e("size", listTemperature.size() + "");
+		currentTempTv.setTypeface(tf);
+		currentHumidityTv.setTypeface(tf);
+		showLine(arrayButtonId[channel - 1]);
+
+		// Set min max textview
+		minTempTv.setText(Collections.min(listTemperature) + " °C");
+		maxTempTv.setText(Collections.max(listTemperature) + " °C");
+		minHumidityTv.setText(Collections.min(listHumidity) + " %");
+		maxHumidityTv.setText(Collections.max(listHumidity) + " %");
+		lastUpdate = System.currentTimeMillis();
+		lastUpdatedTv.setText("Last updated,"
+				+ new SimpleDateFormat("MMM dd HH:mm:ss", Locale.US)
+						.format(new Date(lastUpdate)));
+	}
+
+	/**
+	 * Push data to shared preference
+	 */
+	private void putDataToSharedPreference() {
+		sharedPreferences.putList(BluetoothLeService.EXTRA_TEMPERATURE,
+				listTemperature);
+		sharedPreferences.putList(BluetoothLeService.EXTRA_HUMIDITY,
+				listHumidity);
+	}
 
 	@Override
 	protected void onResume() {
@@ -290,21 +336,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onDestroy();
 		unbindService(mServiceConnection);
 		mBluetoothLeService = null;
-	}
-
-	private void displayData() {
-		currentTempTv.setText(listTemperature.get(listTemperature.size() - 1)
-				+ " \u2103");
-		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
-				+ " %");
-		Log.e("size", listTemperature.size() + "");
-		currentTempTv.setTypeface(tf);
-		currentHumidityTv.setTypeface(tf);
-		showLine(arrayButtonId[channel - 1]);
-		sharedPreferences.putList(BluetoothLeService.EXTRA_TEMPERATURE,
-				listTemperature);
-		listTemperature = new ArrayList<Integer>();
-
 	}
 
 	private void displayGattServices(List<BluetoothGattService> gattServices) {
