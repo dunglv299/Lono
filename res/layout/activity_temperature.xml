@@ -236,14 +236,15 @@
             </LinearLayout>
         </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/graph_layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="15dp"
             android:layout_weight="1"
-            android:background="@color/green_text_color" >
-        </RelativeLayout>
+            android:background="@color/green_text_color"
+            android:orientation="vertical" >
+        </LinearLayout>
     </LinearLayout>
 
     <include

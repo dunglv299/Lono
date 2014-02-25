@@ -311,7 +311,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ new SimpleDateFormat("MMM dd HH:mm:ss", Locale.US)
 						.format(new Date(lastUpdate)));
 		lastUpdatedTv.setVisibility(View.VISIBLE);
-
+		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate);
 	}
 
 	/**
@@ -348,7 +348,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onPause() {
 		super.onPause();
 		scanLeDevice(false);
-		unregisterReceiver(mGattUpdateReceiver);
+		// unregisterReceiver(mGattUpdateReceiver);
 	}
 
 	@Override

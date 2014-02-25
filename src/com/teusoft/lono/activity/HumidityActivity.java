@@ -27,8 +27,11 @@ public class HumidityActivity extends TemperatureActivity implements
 	@Override
 	public void init() {
 		nowTv.setText(listHumidity.get(listHumidity.size() - 1) + " %");
-		minTv.setText(Collections.min(listHumidity) + " %");
-		maxTv.setText(Collections.max(listHumidity) + " %");
+		maxValue = Collections.max(listHumidity);
+		minValue = Collections.min(listHumidity);
+		minTv.setText(minValue + " %");
+		maxTv.setText(minValue + " %");
 		averageTv.setText(getAverage(listHumidity) + " %");
+		drawGraph(listHumidity);
 	}
 }
