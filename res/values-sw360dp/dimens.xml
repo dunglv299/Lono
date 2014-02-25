@@ -1,3 +1,12 @@
 <resources>
 
+    <!-- Main activity -->
+
+    <dimen name="main_text_normal">17sp</dimen>
+    <dimen name="main_text_large">50sp</dimen>
+
+    <!-- Temperature activity -->
+    <dimen name="temp_title_text">20sp</dimen>
+    <dimen name="temp_normal_text">18sp</dimen>
+
 </resources>

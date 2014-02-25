@@ -88,12 +88,12 @@ public class MySharedPreferences {
 		}
 	}
 
-	public List<?> getList(String key) {
-		ArrayList<?> list;
+	public List<Integer> getListInt(String key) {
+		ArrayList<Integer> list;
 		try {
-			list = (ArrayList<?>) ObjectSerializer
-					.deserialize(appSharedPrefs.getString(key,
-							ObjectSerializer.serialize(new ArrayList<Object>())));
+			list = (ArrayList<Integer>) ObjectSerializer
+					.deserialize(appSharedPrefs.getString(key, ObjectSerializer
+							.serialize(new ArrayList<Integer>())));
 			return list;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

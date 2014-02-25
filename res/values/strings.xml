@@ -5,6 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="last_updated">Last updated, %s</string>
     <string name="temperature">TEMPERATURE</string>
+    <string name="humidity">HUMIDITY</string>
     <string name="average">AVERAGE</string>
     <string name="dew_point">DEW POINT</string>
     <string name="now">NOW</string>
