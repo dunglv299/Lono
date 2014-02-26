@@ -75,9 +75,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	private int indexArray;
 	private MySharedPreferences sharedPreferences;
 	private long lastUpdate;
-	private boolean isServiceConnected;
 	private RelativeLayout progressLayout;
 	ProgressDialog mProgressDialog;
+	private List<String> listDevice;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +108,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		listTemperature = new ArrayList<Integer>();
 		listHumidity = new ArrayList<Integer>();
 		sharedPreferences = new MySharedPreferences(this);
+		listDevice = new ArrayList<String>();
 	}
 
 	private void initView() {
@@ -252,7 +253,6 @@ public class MainActivity extends Activity implements OnClickListener {
 			// Automatically connects to the device upon successful start-up
 			// initialization.
 			mBluetoothLeService.connect(mDeviceAddress);
-			isServiceConnected = true;
 		}
 
 		@Override
@@ -372,10 +372,18 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (mServiceConnection != null && isServiceConnected) {
+		boolean isBound = false;
+		isBound = getApplicationContext().bindService(
+				new Intent(getApplicationContext(), BluetoothLeService.class),
+				mServiceConnection, Context.BIND_AUTO_CREATE);
+
+		if (isBound) {
+			unregisterReceiver(mGattUpdateReceiver);
 			unbindService(mServiceConnection);
+			mBluetoothLeService = null;
+
 		}
-		mBluetoothLeService = null;
+
 	}
 
 	private void displayGattServices(List<BluetoothGattService> gattServices) {
@@ -478,9 +486,11 @@ public class MainActivity extends Activity implements OnClickListener {
 				@Override
 				public void run() {
 					if (device != null
-							&& !device.getAddress().equals(mDeviceAddress)) {
+							&& !listDevice.contains(device.getAddress())
+							&& device.getAddress().equals("D0:FF:50:7B:F8:48")) {
 						Log.e("device", device.getAddress());
 						mDeviceAddress = device.getAddress();
+						listDevice.add(mDeviceAddress);
 						Intent gattServiceIntent = new Intent(
 								MainActivity.this, BluetoothLeService.class);
 						bindService(gattServiceIntent, mServiceConnection,

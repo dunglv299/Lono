@@ -104,11 +104,14 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 			dataGraph2[i] = new GraphViewData(i, 0);
 		}
 		GraphViewSeries seriesData1 = new GraphViewSeries("dunglv",
-				new GraphViewSeriesStyle(Color.WHITE, 6), dataGraph1);
+				new GraphViewSeriesStyle(Color.WHITE, (int) getResources()
+						.getDimension(R.dimen.thick_size)), dataGraph1);
 		GraphViewSeries seriesData2 = new GraphViewSeries("dunglv",
 				new GraphViewSeriesStyle(Color.TRANSPARENT, 6), dataGraph2);
 
 		LineGraphView graphView = new LineGraphView(this, "");
+		graphView.getGraphViewStyle().setTextSize(
+				getResources().getDimension(R.dimen.graph_font_size));
 		graphView.getGraphViewStyle().setNumVerticalLabels(6);
 		graphView.getGraphViewStyle().setNumHorizontalLabels(7);
 		setLabelX(listData);
@@ -214,15 +217,5 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 						R.color.color_botton_disable));
 			}
 		}
-	}
-
-	// Get index of button
-	private int getIndex(int id) {
-		for (int i = 0; i < arrayButtonId.length; i++) {
-			if (arrayButtonId[i] == id) {
-				return i;
-			}
-		}
-		return -1;
 	}
 }

@@ -53,6 +53,7 @@ public final class R {
          */
         public static final int activity_horizontal_margin=0x7f060000;
         public static final int activity_vertical_margin=0x7f060001;
+        public static final int graph_font_size=0x7f060007;
         public static final int main_icon_marginLeft=0x7f060002;
         public static final int main_text_large=0x7f060004;
         /**  Main activity 
@@ -63,6 +64,7 @@ public final class R {
  Temperature activity 
          */
         public static final int temp_title_text=0x7f060005;
+        public static final int thick_size=0x7f060008;
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;

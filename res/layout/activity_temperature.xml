@@ -90,7 +90,7 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1.5"
+                    android:layout_weight="1.2"
                     android:gravity="center_vertical" >
 
                     <TextView
@@ -106,7 +106,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:layout_marginRight="80dp"
+                        android:layout_marginRight="60dp"
                         android:text=":"
                         android:textColor="@color/black"
                         android:textSize="@dimen/temp_normal_text" />
@@ -164,7 +164,7 @@
                     android:id="@+id/dewpoint_layout"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1.5"
+                    android:layout_weight="1.2"
                     android:gravity="center_vertical" >
 
                     <TextView
@@ -180,7 +180,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:layout_marginRight="80dp"
+                        android:layout_marginRight="60dp"
                         android:text=":"
                         android:textColor="@color/black"
                         android:textSize="@dimen/temp_normal_text" />
