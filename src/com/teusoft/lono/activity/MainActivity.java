@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,7 +67,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private RelativeLayout tempLayout;
 	private RelativeLayout humidityLayout;
 	private TextView currentTempTv, currentHumidityTv, minTempTv, maxTempTv,
-			minHumidityTv, maxHumidityTv, lastUpdatedTv;
+			minHumidityTv, maxHumidityTv, lastUpdatedTv, lowTv, normalTv,
+			hightTv;
 	private ArrayList<Integer> listTemperature;
 	private ArrayList<Integer> listHumidity;
 	private int channel;
@@ -117,6 +119,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		minHumidityTv = (TextView) findViewById(R.id.tv_min_humidity);
 		maxHumidityTv = (TextView) findViewById(R.id.tv_max_humidity);
 		lastUpdatedTv = (TextView) findViewById(R.id.tv_lastupdated);
+		lowTv = (TextView) findViewById(R.id.tv_low);
+		normalTv = (TextView) findViewById(R.id.tv_normal);
+		hightTv = (TextView) findViewById(R.id.tv_hight);
 		setFont();
 		for (int i = 0; i < arrayButton.length; i++) {
 			arrayButton[i] = (Button) findViewById(arrayButtonId[i]);
@@ -183,12 +188,14 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private void goToTemperatureActivity() {
 		Intent mIntent = new Intent(this, TemperatureActivity.class);
+		mIntent.putExtra(Utils.CHANNEL, channel);
 		startActivity(mIntent);
 		overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
 	}
 
 	private void goToHumidityActivity() {
 		Intent mIntent = new Intent(this, HumidityActivity.class);
+		mIntent.putExtra(Utils.CHANNEL, channel);
 		startActivity(mIntent);
 		overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
 	}
@@ -316,6 +323,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		maxTempTv.setText(Collections.max(listTemperature) + " °C");
 		minHumidityTv.setText(Collections.min(listHumidity) + " %");
 		maxHumidityTv.setText(Collections.max(listHumidity) + " %");
+		setHumidityRange(listHumidity.get(listHumidity.size() - 1));
 		lastUpdate = System.currentTimeMillis();
 		lastUpdatedTv.setText("Last updated,"
 				+ new SimpleDateFormat("MMM dd HH:mm:ss", Locale.US)
@@ -492,6 +500,22 @@ public class MainActivity extends Activity implements OnClickListener {
 			mProgressDialog.setMessage("Loading data...");
 			mProgressDialog.setCancelable(true);
 			mProgressDialog.show();
+		}
+	}
+
+	private void setHumidityRange(int value) {
+		if (value >= 0 && value <= 25) {
+			lowTv.setTextColor(Color.WHITE);
+			normalTv.setTextColor(getResources().getColor(R.color.color_hight));
+			hightTv.setTextColor(getResources().getColor(R.color.color_hight));
+		} else if (value > 25 && value <= 50) {
+			lowTv.setTextColor(getResources().getColor(R.color.color_hight));
+			normalTv.setTextColor(Color.WHITE);
+			hightTv.setTextColor(getResources().getColor(R.color.color_hight));
+		} else {
+			lowTv.setTextColor(getResources().getColor(R.color.color_hight));
+			normalTv.setTextColor(getResources().getColor(R.color.color_hight));
+			hightTv.setTextColor(Color.WHITE);
 		}
 	}
 }

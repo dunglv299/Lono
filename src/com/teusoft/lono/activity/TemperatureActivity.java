@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -27,17 +28,27 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 	Button homeBtn;
 	private MySharedPreferences sharedPreferences;
 	TextView nowTv, minTv, maxTv, averageTv, dewPointTv;
+	private int[] arrayButtonId = { R.id.btn1, R.id.btn2, R.id.btn3 };
+	private Button[] arrayButton = new Button[BUTTONS_SIZE];
+	private static final int BUTTONS_SIZE = 3;
+	private View[] arrayLine = new View[BUTTONS_SIZE];
+	private int[] arrayLineId = { R.id.line_btn1, R.id.line_btn2,
+			R.id.line_btn3 };
+
 	public List<Integer> listTemp;
 	public List<Integer> listHumidity;
 	public int maxValue, minValue;
 	public GraphViewData[] dataGraph1;
 	public long lastUpdated;
 	public String[] labelX = new String[7];
+	private int channel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_temperature);
+		channel = getIntent().getExtras().getInt(Utils.CHANNEL);
+		Log.e("channel", channel + "");
 		sharedPreferences = new MySharedPreferences(this);
 		listTemp = sharedPreferences
 				.getListInt(BluetoothLeService.EXTRA_TEMPERATURE);
@@ -46,6 +57,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED);
 		initView();
 		init();
+		showLine(channel - 1);
 	}
 
 	public void initView() {
@@ -57,6 +69,11 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		maxTv = (TextView) findViewById(R.id.tv_max_value);
 		averageTv = (TextView) findViewById(R.id.tv_average_value);
 		dewPointTv = (TextView) findViewById(R.id.tv_dewpoint_value);
+		for (int i = 0; i < arrayButton.length; i++) {
+			arrayButton[i] = (Button) findViewById(arrayButtonId[i]);
+			arrayLine[i] = findViewById(arrayLineId[i]);
+			arrayButton[i].setOnClickListener(this);
+		}
 	}
 
 	public void init() {
@@ -182,5 +199,30 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		int dewPoint = (int) (Math.pow(((double) humidity / 100d), 1d / 8d)
 				* (112 + 0.9 * temp) + 0.1 * temp - 112);
 		return dewPoint;
+	}
+
+	private void showLine(int index) {
+		// int index = getIndex(id);
+		for (int i = 0; i < arrayButtonId.length; i++) {
+			if (i == index) {
+				arrayLine[i].setVisibility(View.VISIBLE);
+				arrayButton[i].setBackgroundColor(getResources().getColor(
+						R.color.color_botton_enable));
+			} else {
+				arrayLine[i].setVisibility(View.GONE);
+				arrayButton[i].setBackgroundColor(getResources().getColor(
+						R.color.color_botton_disable));
+			}
+		}
+	}
+
+	// Get index of button
+	private int getIndex(int id) {
+		for (int i = 0; i < arrayButtonId.length; i++) {
+			if (arrayButtonId[i] == id) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

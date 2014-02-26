@@ -83,7 +83,7 @@
         android:id="@+id/temp_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="25"
+        android:layout_weight="24"
         android:background="@color/color_temp" >
 
         <ImageView
@@ -152,7 +152,7 @@
         android:id="@+id/humidity_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="25"
+        android:layout_weight="24"
         android:background="@color/color_humidity" >
 
         <ImageView
@@ -251,7 +251,7 @@
     <include
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="13"
+        android:layout_weight="15"
         layout="@layout/bottom_layout" />
 
 </LinearLayout>

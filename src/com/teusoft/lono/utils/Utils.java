@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 
 public class Utils {
 	public static final String LAST_UPDATED = "last_updated";
+	public static final String CHANNEL = "channel";
 
 	public static Typeface getTypeface(Context context) {
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),
