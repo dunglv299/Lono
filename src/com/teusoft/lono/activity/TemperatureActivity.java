@@ -30,7 +30,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 	public List<Integer> listTemp;
 	public List<Integer> listHumidity;
 	public int maxValue, minValue;
-	public GraphViewData[] dataGraph;
+	public GraphViewData[] dataGraph1;
 	public long lastUpdated;
 	public String[] labelX = new String[7];
 
@@ -73,20 +73,32 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 
 	public void drawGraph(List<Integer> listData) {
 		// init example series data
-
-		dataGraph = new GraphViewData[listData.size()];
-		for (int i = 0; i < listData.size(); i++) {
-			dataGraph[i] = new GraphViewData(i, listData.get(i));
+		int size = listData.size() % 288;
+		if (size == 0) {
+			size = 288;
 		}
-		GraphViewSeries seriesData = new GraphViewSeries("dunglv",
-				new GraphViewSeriesStyle(Color.WHITE, 6), dataGraph);
+		dataGraph1 = new GraphViewData[size];
+		GraphViewData[] dataGraph2 = new GraphViewData[288 - size];
+		for (int i = 288 - size; i < 288; i++) {
+			dataGraph1[size - 288 + i] = new GraphViewData(i, listData.get(size
+					- 288 + i));
+		}
+		for (int i = 0; i < 288 - size; i++) {
+			dataGraph2[i] = new GraphViewData(i, 0);
+		}
+		GraphViewSeries seriesData1 = new GraphViewSeries("dunglv",
+				new GraphViewSeriesStyle(Color.WHITE, 6), dataGraph1);
+		GraphViewSeries seriesData2 = new GraphViewSeries("dunglv",
+				new GraphViewSeriesStyle(Color.TRANSPARENT, 6), dataGraph2);
 
 		LineGraphView graphView = new LineGraphView(this, "");
 		graphView.getGraphViewStyle().setNumVerticalLabels(6);
 		graphView.getGraphViewStyle().setNumHorizontalLabels(7);
-		setLabelX();
+		setLabelX(listData);
 		graphView.setHorizontalLabels(labelX);
-		graphView.addSeries(seriesData); // data
+		graphView.addSeries(seriesData1); // data
+		graphView.addSeries(seriesData2); // data
+
 		if (minValue < 0) {
 			graphView.setManualYAxisBounds(maxValue + minValue / 2,
 					minValue - 10);
@@ -98,7 +110,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		layout.addView(graphView);
 	}
 
-	public void setLabelX() {
+	public void setLabelX(List<Integer> listData) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(lastUpdated);
 		calendar.set(Calendar.MINUTE, 0);

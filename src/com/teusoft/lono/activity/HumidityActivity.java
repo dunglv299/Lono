@@ -30,7 +30,7 @@ public class HumidityActivity extends TemperatureActivity implements
 		maxValue = Collections.max(listHumidity);
 		minValue = Collections.min(listHumidity);
 		minTv.setText(minValue + " %");
-		maxTv.setText(minValue + " %");
+		maxTv.setText(maxValue + " %");
 		averageTv.setText(getAverage(listHumidity) + " %");
 		drawGraph(listHumidity);
 	}

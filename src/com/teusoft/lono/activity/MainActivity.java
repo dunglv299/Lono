@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -72,6 +74,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private MySharedPreferences sharedPreferences;
 	private long lastUpdate;
 	private boolean isServiceConnected;
+	private RelativeLayout progressLayout;
+	ProgressDialog mProgressDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +127,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		humidityLayout = (RelativeLayout) findViewById(R.id.humidity_layout);
 		tempLayout.setOnClickListener(this);
 		humidityLayout.setOnClickListener(this);
+		progressLayout = (RelativeLayout) findViewById(R.id.progress_layout);
 		showLine(R.id.btn1);
 	}
 
@@ -255,6 +260,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			final String action = intent.getAction();
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
 				mConnected = true;
+				progressLayout.setVisibility(View.GONE);
 				Log.e("Connected", "Connected");
 				invalidateOptionsMenu();
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
@@ -284,9 +290,13 @@ public class MainActivity extends Activity implements OnClickListener {
 						BluetoothLeService.EXTRA_HUMIDITY, 0));
 				channel = intent.getIntExtra(BluetoothLeService.EXTRA_CHANNEL,
 						0);
-				// Log.e("index", indexArray + "");
+				// Show dialog
+				showProgressDialog();
 				if (indexArray == 1 && listTemperature.size() > 32) {
 					displayData();
+					if (mProgressDialog.isShowing()) {
+						mProgressDialog.dismiss();
+					}
 					putDataToSharedPreference();
 				}
 			}
@@ -427,6 +437,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				@Override
 				public void run() {
 					Log.e("Stop", "Stop");
+					progressLayout.setVisibility(View.GONE);
 					mBluetoothAdapter.stopLeScan(mLeScanCallback);
 					invalidateOptionsMenu();
 				}
@@ -471,4 +482,16 @@ public class MainActivity extends Activity implements OnClickListener {
 			});
 		}
 	};
+
+	public void showProgressDialog() {
+		if (mProgressDialog == null) {
+			mProgressDialog = new ProgressDialog(this,
+					AlertDialog.THEME_HOLO_LIGHT);
+		}
+		if (!mProgressDialog.isShowing()) {
+			mProgressDialog.setMessage("Loading data...");
+			mProgressDialog.setCancelable(true);
+			mProgressDialog.show();
+		}
+	}
 }
