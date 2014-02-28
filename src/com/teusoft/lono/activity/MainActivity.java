@@ -183,15 +183,15 @@ public class MainActivity extends Activity implements OnClickListener {
 			goToHumidityActivity();
 			break;
 		case R.id.btn1:
-			showLine(v.getId());
+			// showLine(v.getId());
 			onButton1Press();
 			break;
 		case R.id.btn2:
-			showLine(v.getId());
+			// showLine(v.getId());
 			onButton2Press();
 			break;
 		case R.id.btn3:
-			showLine(v.getId());
+			// showLine(v.getId());
 			onButton3Press();
 			break;
 		default:
@@ -280,14 +280,32 @@ public class MainActivity extends Activity implements OnClickListener {
 		public void onReceive(Context context, Intent intent) {
 			final String action = intent.getAction();
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-				mConnected = true;
 				Log.e("Connected", "Connected");
 				invalidateOptionsMenu();
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
 					.equals(action)) {
 				Log.e("Disconnected", "Disconnected");
-				mConnected = false;
-				mBluetoothLeService.disconnect();
+				// mBluetoothLeService.disconnect();
+				// if (mConnected) {
+				// for (String address : listDevice) {
+				// if (address != mDeviceAddress) {
+				// mDeviceAddress = address;
+				// mServiceConnection1 = getConnection(mDeviceAddress);
+				// Intent gattServiceIntent = new Intent(
+				// MainActivity.this, BluetoothLeService.class);
+				// bindService(gattServiceIntent, mServiceConnection1,
+				// BIND_AUTO_CREATE);
+				// return;
+				// }
+				// }
+				// } else {
+				// mServiceConnection1 = getConnection(mDeviceAddress);
+				// Intent gattServiceIntent = new Intent(MainActivity.this,
+				// BluetoothLeService.class);
+				// bindService(gattServiceIntent, mServiceConnection1,
+				// BIND_AUTO_CREATE);
+				// }
+				// mConnected = false;
 				invalidateOptionsMenu();
 			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED
 					.equals(action)) {
@@ -315,8 +333,11 @@ public class MainActivity extends Activity implements OnClickListener {
 					}
 					displayData();
 					putDataToSharedPreference();
+					Log.e("display Data", "display Data");
+					mConnected = true;
 					listTemperature = new ArrayList<Integer>();
 					listHumidity = new ArrayList<Integer>();
+					// mBluetoothLeService.disconnect();
 				}
 			}
 		}
@@ -327,8 +348,6 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ " °C");
 		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
 				+ " %");
-		// disconnect
-		// mBluetoothLeService.disconnect();
 		Log.e("size", listTemperature.size() + "");
 		showLine(arrayButtonId[channel - 1]);
 
@@ -346,9 +365,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	public ServiceConnection getConnection(final String address) {
-		if (mBluetoothLeService != null) {
-			mBluetoothLeService.disconnect();
-		}
+		// if (mBluetoothLeService != null) {
+		// mBluetoothLeService.disconnect();
+		// }
 		ServiceConnection serviceConnection = new ServiceConnection() {
 			@Override
 			public void onServiceConnected(ComponentName componentName,
@@ -374,7 +393,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	public void onConnect1Press(View v) {
-		mDeviceAddress = "D0:FF:50:7C:04:F1";
+		// mDeviceAddress = "D0:FF:50:7C:04:F1";
+		mDeviceAddress = "D0:FF:50:7B:F9:BA";
 		mServiceConnection1 = getConnection(mDeviceAddress);
 		Intent gattServiceIntent = new Intent(MainActivity.this,
 				BluetoothLeService.class);
@@ -525,6 +545,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	// Device scan callback.
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+		boolean isConnected;
 
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi,
@@ -532,18 +553,21 @@ public class MainActivity extends Activity implements OnClickListener {
 			// runOnUiThread(new Runnable() {
 			// @Override
 			// public void run() {
-			if (device != null && !listDevice.contains(device.getAddress())
-					&& !device.getAddress().equals("D0:FF:50:7B:F8:48")) {
+			if (device != null && !listDevice.contains(device.getAddress())) {
+				// && device.getAddress().equals("D0:FF:50:7B:F8:48")) {
 				Log.e("device", device.getAddress());
-				mDeviceAddress = device.getAddress();
-				// listDevice.add(device.getAddress());
+				listDevice.add(device.getAddress());
 				// mDeviceAddress = "D0:FF:50:7B:F8:48";
 				// mDeviceAddress = "D0:FF:50:7C:04:F1";
+				// if (!isConnected) {
+				mDeviceAddress = device.getAddress();
+				mServiceConnection1 = getConnection(mDeviceAddress);
 				Intent gattServiceIntent = new Intent(MainActivity.this,
 						BluetoothLeService.class);
-				bindService(gattServiceIntent, getConnection(mDeviceAddress),
+				bindService(gattServiceIntent, mServiceConnection1,
 						BIND_AUTO_CREATE);
-				return;
+				// isConnected = true;
+				// }
 			}
 			// }
 			// });

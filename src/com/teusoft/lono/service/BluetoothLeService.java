@@ -218,7 +218,7 @@ public class BluetoothLeService extends Service {
 		if (mBluetoothDeviceAddress != null
 				&& address.equals(mBluetoothDeviceAddress)
 				&& mBluetoothGatt != null) {
-			Log.d(TAG,
+			Log.e(TAG,
 					"Trying to use an existing mBluetoothGatt for connection.");
 			if (mBluetoothGatt.connect()) {
 				mConnectionState = STATE_CONNECTING;
@@ -238,7 +238,7 @@ public class BluetoothLeService extends Service {
 		// autoConnect
 		// parameter to false.
 		mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-		Log.d(TAG, "Trying to create a new connection.");
+		Log.e(TAG, "Trying to create a new connection.");
 		mBluetoothDeviceAddress = address;
 		mConnectionState = STATE_CONNECTING;
 		return true;
