@@ -60,6 +60,7 @@ public class BluetoothLeService extends Service {
 	public final static String EXTRA_HUMIDITY = "humidity";
 	public final static String EXTRA_COUNT = "count";
 	public final static String EXTRA_CHANNEL = "channel";
+	public final static String EXTRA_TYPE = "type";
 
 	public static final UUID TEMPERATURE_MEASUREMENT_CHARACTERISTIC = UUID
 			.fromString("00002A1C-0000-1000-8000-00805f9b34fb");
@@ -131,12 +132,16 @@ public class BluetoothLeService extends Service {
 					BluetoothGattCharacteristic.FORMAT_UINT8, 1);
 			int channel = characteristic.getIntValue(
 					BluetoothGattCharacteristic.FORMAT_UINT8, 2).intValue();
+			int type = characteristic.getIntValue(
+					BluetoothGattCharacteristic.FORMAT_UINT8, 0).intValue();
+
 			// Log.e("temperature", temperature + "");
 			// Log.e("humidity", humidity + "");
 			intent.putExtra(EXTRA_TEMPERATURE, temperature);
 			intent.putExtra(EXTRA_HUMIDITY, humidity);
 			intent.putExtra(EXTRA_COUNT, count);
 			intent.putExtra(EXTRA_CHANNEL, channel);
+			intent.putExtra(EXTRA_TYPE, type);
 		}
 		sendBroadcast(intent);
 	}

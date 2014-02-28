@@ -56,7 +56,9 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 				.getListInt(BluetoothLeService.EXTRA_HUMIDITY);
 		lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED);
 		initView();
-		init();
+		if (listTemp.size() > 0) {
+			init();
+		}
 		showLine(channel - 1);
 	}
 
@@ -112,18 +114,22 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		LineGraphView graphView = new LineGraphView(this, "");
 		graphView.getGraphViewStyle().setTextSize(
 				getResources().getDimension(R.dimen.graph_font_size));
-		graphView.getGraphViewStyle().setNumVerticalLabels(6);
+		graphView.getGraphViewStyle().setNumVerticalLabels(5);
 		graphView.getGraphViewStyle().setNumHorizontalLabels(7);
 		setLabelX(listData);
 		graphView.setHorizontalLabels(labelX);
 		graphView.addSeries(seriesData1); // data
 		graphView.addSeries(seriesData2); // data
-
+		int maxY = maxValue + minValue / 2;
 		if (minValue < 0) {
 			graphView.setManualYAxisBounds(maxValue + minValue / 2,
 					minValue - 10);
 		} else {
-			graphView.setManualYAxisBounds(maxValue + minValue / 2, 0);
+			if (maxY > 40) {
+				graphView.setManualYAxisBounds(maxValue + minValue / 2, 0);
+			} else {
+				graphView.setManualYAxisBounds(40, 0);
+			}
 		}
 
 		LinearLayout layout = (LinearLayout) findViewById(R.id.graph_layout);

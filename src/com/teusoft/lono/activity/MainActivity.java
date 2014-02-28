@@ -72,12 +72,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ArrayList<Integer> listTemperature;
 	private ArrayList<Integer> listHumidity;
 	private int channel;
+	private int type;
 	private int indexArray;
 	private MySharedPreferences sharedPreferences;
 	private long lastUpdate;
 	private RelativeLayout progressLayout;
 	ProgressDialog mProgressDialog;
 	private List<String> listDevice;
+	private ServiceConnection mServiceConnection1;
+	private ServiceConnection mServiceConnection2;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +103,14 @@ public class MainActivity extends Activity implements OnClickListener {
 					Toast.LENGTH_SHORT).show();
 			finish();
 			return;
+		}
+		if (!mBluetoothAdapter.isEnabled()) {
+			Intent enableBtIntent = new Intent(
+					BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+		} else {
+			// Start scan
+			scanLeDevice(true);
 		}
 
 	}
@@ -134,7 +145,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		tempLayout.setOnClickListener(this);
 		humidityLayout.setOnClickListener(this);
 		progressLayout = (RelativeLayout) findViewById(R.id.progress_layout);
-		showLine(R.id.btn1);
+		progressLayout.setVisibility(View.GONE);
+		// showLine(R.id.btn1);
 	}
 
 	public void setFont() {
@@ -239,27 +251,29 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	// Code to manage Service lifecycle.
-	private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-		@Override
-		public void onServiceConnected(ComponentName componentName,
-				IBinder service) {
-			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
-					.getService();
-			if (!mBluetoothLeService.initialize()) {
-				Log.e(TAG, "Unable to initialize Bluetooth");
-				finish();
-			}
-			// Automatically connects to the device upon successful start-up
-			// initialization.
-			mBluetoothLeService.connect(mDeviceAddress);
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName componentName) {
-			mBluetoothLeService = null;
-		}
-	};
+	// private final ServiceConnection mServiceConnection = new
+	// ServiceConnection() {
+	//
+	// @Override
+	// public void onServiceConnected(ComponentName componentName,
+	// IBinder service) {
+	// Log.e("onServiceConnected", "onServiceConnected");
+	// mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
+	// .getService();
+	// if (!mBluetoothLeService.initialize()) {
+	// Log.e(TAG, "Unable to initialize Bluetooth");
+	// finish();
+	// }
+	// // Automatically connects to the device upon successful start-up
+	// // initialization.
+	// mBluetoothLeService.connect(mDeviceAddress);
+	// }
+	//
+	// @Override
+	// public void onServiceDisconnected(ComponentName componentName) {
+	// mBluetoothLeService = null;
+	// }
+	// };
 
 	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 		@Override
@@ -267,20 +281,14 @@ public class MainActivity extends Activity implements OnClickListener {
 			final String action = intent.getAction();
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
 				mConnected = true;
-				progressLayout.setVisibility(View.GONE);
 				Log.e("Connected", "Connected");
 				invalidateOptionsMenu();
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
 					.equals(action)) {
 				Log.e("Disconnected", "Disconnected");
 				mConnected = false;
+				mBluetoothLeService.disconnect();
 				invalidateOptionsMenu();
-
-				// Reset data
-				if (listTemperature.size() > 0) {
-					putDataToSharedPreference();
-				}
-				listTemperature = new ArrayList<Integer>();
 			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED
 					.equals(action)) {
 				// Show all the supported services and characteristics on the
@@ -297,14 +305,18 @@ public class MainActivity extends Activity implements OnClickListener {
 						BluetoothLeService.EXTRA_HUMIDITY, 0));
 				channel = intent.getIntExtra(BluetoothLeService.EXTRA_CHANNEL,
 						0);
+				type = intent.getIntExtra(BluetoothLeService.EXTRA_TYPE, 0);
 				// Show dialog
 				showProgressDialog();
-				if (indexArray == 1 && listTemperature.size() > 32) {
-					displayData();
+				if (type == 0 && indexArray == 1) {
+					progressLayout.setVisibility(View.GONE);
 					if (mProgressDialog.isShowing()) {
 						mProgressDialog.dismiss();
 					}
+					displayData();
 					putDataToSharedPreference();
+					listTemperature = new ArrayList<Integer>();
+					listHumidity = new ArrayList<Integer>();
 				}
 			}
 		}
@@ -315,6 +327,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ " °C");
 		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
 				+ " %");
+		// disconnect
+		// mBluetoothLeService.disconnect();
 		Log.e("size", listTemperature.size() + "");
 		showLine(arrayButtonId[channel - 1]);
 
@@ -329,7 +343,50 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ new SimpleDateFormat("MMM dd HH:mm:ss", Locale.US)
 						.format(new Date(lastUpdate)));
 		lastUpdatedTv.setVisibility(View.VISIBLE);
-		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate);
+	}
+
+	public ServiceConnection getConnection(final String address) {
+		if (mBluetoothLeService != null) {
+			mBluetoothLeService.disconnect();
+		}
+		ServiceConnection serviceConnection = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName componentName,
+					IBinder service) {
+				Log.e("onServiceConnected", "onServiceConnected");
+				mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
+						.getService();
+				if (!mBluetoothLeService.initialize()) {
+					Log.e(TAG, "Unable to initialize Bluetooth");
+					finish();
+				}
+				// Automatically connects to the device upon successful start-up
+				// initialization.
+				mBluetoothLeService.connect(address);
+			}
+
+			@Override
+			public void onServiceDisconnected(ComponentName componentName) {
+				// mBluetoothLeService = null;
+			}
+		};
+		return serviceConnection;
+	}
+
+	public void onConnect1Press(View v) {
+		mDeviceAddress = "D0:FF:50:7C:04:F1";
+		mServiceConnection1 = getConnection(mDeviceAddress);
+		Intent gattServiceIntent = new Intent(MainActivity.this,
+				BluetoothLeService.class);
+		bindService(gattServiceIntent, mServiceConnection1, BIND_AUTO_CREATE);
+	}
+
+	public void onConnect2Press(View v) {
+		mDeviceAddress = "D0:FF:50:7B:F8:48";
+		mServiceConnection2 = getConnection(mDeviceAddress);
+		Intent gattServiceIntent = new Intent(MainActivity.this,
+				BluetoothLeService.class);
+		bindService(gattServiceIntent, mServiceConnection2, BIND_AUTO_CREATE);
 	}
 
 	/**
@@ -340,49 +397,39 @@ public class MainActivity extends Activity implements OnClickListener {
 				listTemperature);
 		sharedPreferences.putList(BluetoothLeService.EXTRA_HUMIDITY,
 				listHumidity);
+		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-		if (mBluetoothLeService != null) {
-			final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-			Log.d(TAG, "Connect request result=" + result);
-		}
-		if (!mBluetoothAdapter.isEnabled()) {
-			if (!mBluetoothAdapter.isEnabled()) {
-				Intent enableBtIntent = new Intent(
-						BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			}
-		} else {
-			// Start scan
-			scanLeDevice(true);
-		}
+		// if (mBluetoothLeService != null) {
+		// final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+		// Log.d(TAG, "Connect request result=" + result);
+		// }
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 		scanLeDevice(false);
-		// unregisterReceiver(mGattUpdateReceiver);
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		boolean isBound = false;
-		isBound = getApplicationContext().bindService(
-				new Intent(getApplicationContext(), BluetoothLeService.class),
-				mServiceConnection, Context.BIND_AUTO_CREATE);
-
-		if (isBound) {
-			unregisterReceiver(mGattUpdateReceiver);
-			unbindService(mServiceConnection);
+		unregisterReceiver(mGattUpdateReceiver);
+		if (mBluetoothLeService != null) {
+			if (mServiceConnection1 != null) {
+				unbindService(mServiceConnection1);
+			}
+			if (mServiceConnection2 != null) {
+				unbindService(mServiceConnection2);
+			}
 			mBluetoothLeService = null;
-
 		}
+		putDataToSharedPreference();
 
 	}
 
@@ -482,22 +529,24 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi,
 				byte[] scanRecord) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					if (device != null
-							&& !listDevice.contains(device.getAddress())
-							&& device.getAddress().equals("D0:FF:50:7B:F8:48")) {
-						Log.e("device", device.getAddress());
-						mDeviceAddress = device.getAddress();
-						listDevice.add(mDeviceAddress);
-						Intent gattServiceIntent = new Intent(
-								MainActivity.this, BluetoothLeService.class);
-						bindService(gattServiceIntent, mServiceConnection,
-								BIND_AUTO_CREATE);
-					}
-				}
-			});
+			// runOnUiThread(new Runnable() {
+			// @Override
+			// public void run() {
+			if (device != null && !listDevice.contains(device.getAddress())
+					&& !device.getAddress().equals("D0:FF:50:7B:F8:48")) {
+				Log.e("device", device.getAddress());
+				mDeviceAddress = device.getAddress();
+				// listDevice.add(device.getAddress());
+				// mDeviceAddress = "D0:FF:50:7B:F8:48";
+				// mDeviceAddress = "D0:FF:50:7C:04:F1";
+				Intent gattServiceIntent = new Intent(MainActivity.this,
+						BluetoothLeService.class);
+				bindService(gattServiceIntent, getConnection(mDeviceAddress),
+						BIND_AUTO_CREATE);
+				return;
+			}
+			// }
+			// });
 		}
 	};
 
