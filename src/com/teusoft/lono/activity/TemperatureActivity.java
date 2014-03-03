@@ -41,6 +41,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 	public long lastUpdated;
 	public String[] labelX = new String[7];
 	private int channel;
+	LinearLayout graphLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +98,8 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 	}
 
 	public void drawGraph(List<Integer> listData) {
+		graphLayout = (LinearLayout) findViewById(R.id.graph_layout);
+		graphLayout.removeAllViews();
 		// init example series data
 		int size = listData.size() % 288;
 		if (size == 0) {
@@ -137,9 +140,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 				graphView.setManualYAxisBounds(40, 0);
 			}
 		}
-
-		LinearLayout layout = (LinearLayout) findViewById(R.id.graph_layout);
-		layout.addView(graphView);
+		graphLayout.addView(graphView);
 	}
 
 	public void setLabelX(List<Integer> listData) {

@@ -76,10 +76,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ArrayList<Integer> listTemperature3;
 	private ArrayList<Integer> listHumidity3;
 	private int channel;
-	private int type;
-	private int indexArray;
 	private MySharedPreferences sharedPreferences;
-	private long lastUpdate;
+	private long lastUpdate1, lastUpdate2, lastUpdate3;
 	private RelativeLayout progressLayout;
 	ProgressDialog mProgressDialog;
 	private List<String> listDevice;
@@ -128,7 +126,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		sharedPreferences = new MySharedPreferences(this);
 		listDevice = new ArrayList<String>();
 		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-
 	}
 
 	private void initView() {
@@ -193,15 +190,12 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.btn1:
 			onButton1Press();
-			// showLine(v.getId());
 			break;
 		case R.id.btn2:
 			onButton2Press();
-			// showLine(v.getId());
 			break;
 		case R.id.btn3:
 			onButton3Press();
-			// showLine(v.getId());
 			break;
 		default:
 			break;
@@ -250,21 +244,21 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void onButton1Press() {
 		if (listTemperature1.size() > 0) {
 			channel = 1;
-			displayData(listTemperature1, listHumidity1);
+			displayData(listTemperature1, listHumidity1, lastUpdate1);
 		}
 	}
 
 	private void onButton2Press() {
 		if (listTemperature2.size() > 0) {
 			channel = 2;
-			displayData(listTemperature2, listHumidity2);
+			displayData(listTemperature2, listHumidity2, lastUpdate2);
 		}
 	}
 
 	private void onButton3Press() {
 		if (listTemperature3.size() > 0) {
 			channel = 3;
-			displayData(listTemperature3, listHumidity3);
+			displayData(listTemperature3, listHumidity3, lastUpdate3);
 		}
 	}
 
@@ -292,97 +286,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	// mBluetoothLeService = null;
 	// }
 	// };
-
-	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			final String action = intent.getAction();
-			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-				Log.e("Connected", "Connected");
-				invalidateOptionsMenu();
-			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
-					.equals(action)) {
-				Log.e("Disconnected", "Disconnected");
-				mConnected = false;
-				invalidateOptionsMenu();
-			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED
-					.equals(action)) {
-				// Show all the supported services and characteristics on the
-				// user interface.
-				Log.e("Discovered", "Discovered");
-				displayGattServices(mBluetoothLeService
-						.getSupportedGattServices());
-			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-				indexArray = intent.getIntExtra(BluetoothLeService.EXTRA_COUNT,
-						0);
-				int temperature = intent.getIntExtra(
-						BluetoothLeService.EXTRA_TEMPERATURE, 0);
-				int humidity = intent.getIntExtra(
-						BluetoothLeService.EXTRA_HUMIDITY, 0);
-				channel = intent.getIntExtra(BluetoothLeService.EXTRA_CHANNEL,
-						0);
-				type = intent.getIntExtra(BluetoothLeService.EXTRA_TYPE, 0);
-				// Show dialog
-				showProgressDialog();
-				if (channel == 1) {
-					listTemperature1.add(temperature);
-					listHumidity1.add(humidity);
-					if (type == 0 && indexArray == 1) {
-						progressLayout.setVisibility(View.GONE);
-						if (mProgressDialog.isShowing()) {
-							mProgressDialog.dismiss();
-						}
-						displayData(listTemperature1, listHumidity1);
-						putDataToSharedPreference();
-						Log.e("display Data", "display Data");
-						// listTemperature1 = new ArrayList<Integer>();
-						// listHumidity1 = new ArrayList<Integer>();
-					}
-				} else if (channel == 2) {
-					listTemperature2.add(temperature);
-					listHumidity2.add(humidity);
-					if (type == 0 && indexArray == 1) {
-						progressLayout.setVisibility(View.GONE);
-						if (mProgressDialog.isShowing()) {
-							mProgressDialog.dismiss();
-						}
-						displayData(listTemperature2, listHumidity2);
-						putDataToSharedPreference();
-						Log.e("display Data", "display Data");
-						// listTemperature2 = new ArrayList<Integer>();
-						// listHumidity2 = new ArrayList<Integer>();
-					}
-				}
-			}
-		}
-	};
-
-	private void displayData(ArrayList<Integer> listTemperature,
-			ArrayList<Integer> listHumidity) {
-		currentTempTv.setText(listTemperature.get(listTemperature.size() - 1)
-				+ " °C");
-		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
-				+ " %");
-		Log.e("size", listTemperature.size() + "");
-		showLine(arrayButtonId[channel - 1]);
-
-		// Set min max textview
-		minTempTv.setText(Collections.min(listTemperature) + " °C");
-		maxTempTv.setText(Collections.max(listTemperature) + " °C");
-		minHumidityTv.setText(Collections.min(listHumidity) + " %");
-		maxHumidityTv.setText(Collections.max(listHumidity) + " %");
-		setHumidityRange(listHumidity.get(listHumidity.size() - 1));
-		lastUpdate = System.currentTimeMillis();
-		lastUpdatedTv.setText("Last updated,"
-				+ new SimpleDateFormat("MMM dd HH:mm:ss", Locale.US)
-						.format(new Date(lastUpdate)));
-		lastUpdatedTv.setVisibility(View.VISIBLE);
-	}
-
 	public ServiceConnection getConnection(final String address) {
-		// if (mBluetoothLeService != null) {
-		// mBluetoothLeService.disconnect();
-		// }
 		ServiceConnection serviceConnection = new ServiceConnection() {
 			@Override
 			public void onServiceConnected(ComponentName componentName,
@@ -407,22 +311,92 @@ public class MainActivity extends Activity implements OnClickListener {
 		return serviceConnection;
 	}
 
-	// public void onConnect1Press(View v) {
-	// // mDeviceAddress = "D0:FF:50:7C:04:F1";
-	// mDeviceAddress = "D0:FF:50:7B:F9:BA";
-	// mServiceConnection1 = getConnection(mDeviceAddress);
-	// Intent gattServiceIntent = new Intent(MainActivity.this,
-	// BluetoothLeService.class);
-	// bindService(gattServiceIntent, mServiceConnection1, BIND_AUTO_CREATE);
-	// }
-	//
-	// public void onConnect2Press(View v) {
-	// mDeviceAddress = "D0:FF:50:7B:F8:48";
-	// mServiceConnection2 = getConnection(mDeviceAddress);
-	// Intent gattServiceIntent = new Intent(MainActivity.this,
-	// BluetoothLeService.class);
-	// bindService(gattServiceIntent, mServiceConnection2, BIND_AUTO_CREATE);
-	// }
+	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			final String action = intent.getAction();
+			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+				Log.e("Connected", "Connected");
+				invalidateOptionsMenu();
+			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
+					.equals(action)) {
+				Log.e("Disconnected", "Disconnected");
+				mConnected = false;
+				invalidateOptionsMenu();
+			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED
+					.equals(action)) {
+				// Show all the supported services and characteristics on the
+				// user interface.
+				Log.e("Discovered", "Discovered");
+				displayGattServices(mBluetoothLeService
+						.getSupportedGattServices());
+			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+				int indexArray = intent.getIntExtra(
+						BluetoothLeService.EXTRA_COUNT, 0);
+				int temperature = intent.getIntExtra(
+						BluetoothLeService.EXTRA_TEMPERATURE, 0);
+				int humidity = intent.getIntExtra(
+						BluetoothLeService.EXTRA_HUMIDITY, 0);
+				channel = intent.getIntExtra(BluetoothLeService.EXTRA_CHANNEL,
+						0);
+				int type = intent.getIntExtra(BluetoothLeService.EXTRA_TYPE, 0);
+				// Show dialog
+				showProgressDialog();
+				if (channel == 1) {
+					listTemperature1.add(temperature);
+					listHumidity1.add(humidity);
+					if (type == 0 && indexArray == 1) {
+						lastUpdate1 = System.currentTimeMillis();
+						displayData(listTemperature1, listHumidity1,
+								lastUpdate1);
+					}
+				} else if (channel == 2) {
+					listTemperature2.add(temperature);
+					listHumidity2.add(humidity);
+					if (type == 0 && indexArray == 1) {
+						lastUpdate2 = System.currentTimeMillis();
+						displayData(listTemperature2, listHumidity2,
+								lastUpdate2);
+					}
+				} else if (channel == 3) {
+					listTemperature3.add(temperature);
+					listHumidity3.add(humidity);
+					if (type == 0 && indexArray == 1) {
+						lastUpdate3 = System.currentTimeMillis();
+						displayData(listTemperature3, listHumidity3,
+								lastUpdate3);
+					}
+				}
+			}
+		}
+	};
+
+	private void displayData(ArrayList<Integer> listTemperature,
+			ArrayList<Integer> listHumidity, long lastUpdate) {
+		progressLayout.setVisibility(View.GONE);
+		mProgressDialog.dismiss();
+		Log.e("display Data", "display Data");
+		currentTempTv.setText(listTemperature.get(listTemperature.size() - 1)
+				+ " °C");
+		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
+				+ " %");
+		Log.e("size", listTemperature.size() + "");
+		showLine(arrayButtonId[channel - 1]);
+
+		// Set min max textview
+		minTempTv.setText(Collections.min(listTemperature) + " °C");
+		maxTempTv.setText(Collections.max(listTemperature) + " °C");
+		minHumidityTv.setText(Collections.min(listHumidity) + " %");
+		maxHumidityTv.setText(Collections.max(listHumidity) + " %");
+		setHumidityRange(listHumidity.get(listHumidity.size() - 1));
+		if (lastUpdate > 0) {
+			lastUpdatedTv.setText("Last updated,"
+					+ new SimpleDateFormat("MMM dd HH:mm:ss", Locale.US)
+							.format(new Date(lastUpdate)));
+		}
+		lastUpdatedTv.setVisibility(View.VISIBLE);
+		putDataToSharedPreference();
+	}
 
 	/**
 	 * Push data to shared preference
@@ -434,7 +408,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		sharedPreferences.putList(Utils.LIST_HUMID1, listHumidity1);
 		sharedPreferences.putList(Utils.LIST_HUMID2, listHumidity2);
 		sharedPreferences.putList(Utils.LIST_HUMID3, listHumidity3);
-		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate);
+		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate1);
+		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate2);
+		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate3);
 	}
 
 	@Override
@@ -562,7 +538,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		public void onLeScan(final BluetoothDevice device, int rssi,
 				byte[] scanRecord) {
 			if (device != null && !listDevice.contains(device.getAddress())) {
-				// && device.getAddress().equals("D0:FF:50:7B:F8:48")) {
 				Log.e("device", device.getAddress());
 				listDevice.add(device.getAddress());
 				// mDeviceAddress = "D0:FF:50:7B:F8:48";
