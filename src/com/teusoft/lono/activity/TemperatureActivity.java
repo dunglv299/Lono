@@ -53,15 +53,20 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		if (channel == 1) {
 			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP1);
 			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID1);
+			lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED1);
+
 		} else if (channel == 2) {
 			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP2);
 			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID2);
+			lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED2);
+
 		} else {
 			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP3);
 			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID3);
+			lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED3);
+
 		}
 
-		lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED);
 		initView();
 		if (listTemp.size() > 0) {
 			init();
@@ -163,6 +168,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		case R.id.btn1:
 			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP1);
 			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID1);
+			lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED1);
 			if (listTemp.size() > 0) {
 				init();
 				showLine(0);
@@ -171,6 +177,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		case R.id.btn2:
 			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP2);
 			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID2);
+			lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED2);
 			if (listTemp.size() > 0) {
 				init();
 				showLine(1);
@@ -179,6 +186,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		case R.id.btn3:
 			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP3);
 			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID3);
+			lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED3);
 			if (listTemp.size() > 0) {
 				init();
 				showLine(2);

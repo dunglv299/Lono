@@ -408,9 +408,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		sharedPreferences.putList(Utils.LIST_HUMID1, listHumidity1);
 		sharedPreferences.putList(Utils.LIST_HUMID2, listHumidity2);
 		sharedPreferences.putList(Utils.LIST_HUMID3, listHumidity3);
-		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate1);
-		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate2);
-		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate3);
+		sharedPreferences.putLong(Utils.LAST_UPDATED1, lastUpdate1);
+		sharedPreferences.putLong(Utils.LAST_UPDATED2, lastUpdate2);
+		sharedPreferences.putLong(Utils.LAST_UPDATED3, lastUpdate3);
 	}
 
 	@Override
