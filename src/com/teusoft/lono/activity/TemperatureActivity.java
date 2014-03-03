@@ -20,7 +20,6 @@ import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.GraphViewSeries.GraphViewSeriesStyle;
 import com.jjoe64.graphview.LineGraphView;
 import com.teusoft.lono.R;
-import com.teusoft.lono.service.BluetoothLeService;
 import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
 
@@ -50,10 +49,17 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		channel = getIntent().getExtras().getInt(Utils.CHANNEL);
 		Log.e("channel", channel + "");
 		sharedPreferences = new MySharedPreferences(this);
-		listTemp = sharedPreferences
-				.getListInt(BluetoothLeService.EXTRA_TEMPERATURE);
-		listHumidity = sharedPreferences
-				.getListInt(BluetoothLeService.EXTRA_HUMIDITY);
+		if (channel == 1) {
+			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP1);
+			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID1);
+		} else if (channel == 2) {
+			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP2);
+			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID2);
+		} else {
+			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP3);
+			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID3);
+		}
+
 		lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED);
 		initView();
 		if (listTemp.size() > 0) {
@@ -153,7 +159,30 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		case R.id.home_btn:
 			goBack();
 			break;
-
+		case R.id.btn1:
+			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP1);
+			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID1);
+			if (listTemp.size() > 0) {
+				init();
+				showLine(0);
+			}
+			break;
+		case R.id.btn2:
+			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP2);
+			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID2);
+			if (listTemp.size() > 0) {
+				init();
+				showLine(1);
+			}
+			break;
+		case R.id.btn3:
+			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP3);
+			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID3);
+			if (listTemp.size() > 0) {
+				init();
+				showLine(2);
+			}
+			break;
 		default:
 			break;
 		}

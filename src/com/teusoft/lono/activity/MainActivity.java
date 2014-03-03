@@ -69,8 +69,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView currentTempTv, currentHumidityTv, minTempTv, maxTempTv,
 			minHumidityTv, maxHumidityTv, lastUpdatedTv, lowTv, normalTv,
 			hightTv;
-	private ArrayList<Integer> listTemperature;
-	private ArrayList<Integer> listHumidity;
+	private ArrayList<Integer> listTemperature1;
+	private ArrayList<Integer> listHumidity1;
+	private ArrayList<Integer> listTemperature2;
+	private ArrayList<Integer> listHumidity2;
+	private ArrayList<Integer> listTemperature3;
+	private ArrayList<Integer> listHumidity3;
 	private int channel;
 	private int type;
 	private int indexArray;
@@ -80,7 +84,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	ProgressDialog mProgressDialog;
 	private List<String> listDevice;
 	private ServiceConnection mServiceConnection1;
-	private ServiceConnection mServiceConnection2;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +119,16 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	private void initData() {
-		listTemperature = new ArrayList<Integer>();
-		listHumidity = new ArrayList<Integer>();
+		listTemperature1 = new ArrayList<Integer>();
+		listHumidity1 = new ArrayList<Integer>();
+		listTemperature2 = new ArrayList<Integer>();
+		listHumidity2 = new ArrayList<Integer>();
+		listTemperature3 = new ArrayList<Integer>();
+		listHumidity3 = new ArrayList<Integer>();
 		sharedPreferences = new MySharedPreferences(this);
 		listDevice = new ArrayList<String>();
+		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+
 	}
 
 	private void initView() {
@@ -183,16 +192,16 @@ public class MainActivity extends Activity implements OnClickListener {
 			goToHumidityActivity();
 			break;
 		case R.id.btn1:
-			// showLine(v.getId());
 			onButton1Press();
+			// showLine(v.getId());
 			break;
 		case R.id.btn2:
-			// showLine(v.getId());
 			onButton2Press();
+			// showLine(v.getId());
 			break;
 		case R.id.btn3:
-			// showLine(v.getId());
 			onButton3Press();
+			// showLine(v.getId());
 			break;
 		default:
 			break;
@@ -239,15 +248,24 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	private void onButton1Press() {
-
-	}
-
-	private void onButton3Press() {
-
+		if (listTemperature1.size() > 0) {
+			channel = 1;
+			displayData(listTemperature1, listHumidity1);
+		}
 	}
 
 	private void onButton2Press() {
+		if (listTemperature2.size() > 0) {
+			channel = 2;
+			displayData(listTemperature2, listHumidity2);
+		}
+	}
 
+	private void onButton3Press() {
+		if (listTemperature3.size() > 0) {
+			channel = 3;
+			displayData(listTemperature3, listHumidity3);
+		}
 	}
 
 	// Code to manage Service lifecycle.
@@ -285,27 +303,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
 					.equals(action)) {
 				Log.e("Disconnected", "Disconnected");
-				// mBluetoothLeService.disconnect();
-				// if (mConnected) {
-				// for (String address : listDevice) {
-				// if (address != mDeviceAddress) {
-				// mDeviceAddress = address;
-				// mServiceConnection1 = getConnection(mDeviceAddress);
-				// Intent gattServiceIntent = new Intent(
-				// MainActivity.this, BluetoothLeService.class);
-				// bindService(gattServiceIntent, mServiceConnection1,
-				// BIND_AUTO_CREATE);
-				// return;
-				// }
-				// }
-				// } else {
-				// mServiceConnection1 = getConnection(mDeviceAddress);
-				// Intent gattServiceIntent = new Intent(MainActivity.this,
-				// BluetoothLeService.class);
-				// bindService(gattServiceIntent, mServiceConnection1,
-				// BIND_AUTO_CREATE);
-				// }
-				// mConnected = false;
+				mConnected = false;
 				invalidateOptionsMenu();
 			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED
 					.equals(action)) {
@@ -317,33 +315,50 @@ public class MainActivity extends Activity implements OnClickListener {
 			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
 				indexArray = intent.getIntExtra(BluetoothLeService.EXTRA_COUNT,
 						0);
-				listTemperature.add(intent.getIntExtra(
-						BluetoothLeService.EXTRA_TEMPERATURE, 0));
-				listHumidity.add(intent.getIntExtra(
-						BluetoothLeService.EXTRA_HUMIDITY, 0));
+				int temperature = intent.getIntExtra(
+						BluetoothLeService.EXTRA_TEMPERATURE, 0);
+				int humidity = intent.getIntExtra(
+						BluetoothLeService.EXTRA_HUMIDITY, 0);
 				channel = intent.getIntExtra(BluetoothLeService.EXTRA_CHANNEL,
 						0);
 				type = intent.getIntExtra(BluetoothLeService.EXTRA_TYPE, 0);
 				// Show dialog
 				showProgressDialog();
-				if (type == 0 && indexArray == 1) {
-					progressLayout.setVisibility(View.GONE);
-					if (mProgressDialog.isShowing()) {
-						mProgressDialog.dismiss();
+				if (channel == 1) {
+					listTemperature1.add(temperature);
+					listHumidity1.add(humidity);
+					if (type == 0 && indexArray == 1) {
+						progressLayout.setVisibility(View.GONE);
+						if (mProgressDialog.isShowing()) {
+							mProgressDialog.dismiss();
+						}
+						displayData(listTemperature1, listHumidity1);
+						putDataToSharedPreference();
+						Log.e("display Data", "display Data");
+						// listTemperature1 = new ArrayList<Integer>();
+						// listHumidity1 = new ArrayList<Integer>();
 					}
-					displayData();
-					putDataToSharedPreference();
-					Log.e("display Data", "display Data");
-					mConnected = true;
-					listTemperature = new ArrayList<Integer>();
-					listHumidity = new ArrayList<Integer>();
-					// mBluetoothLeService.disconnect();
+				} else if (channel == 2) {
+					listTemperature2.add(temperature);
+					listHumidity2.add(humidity);
+					if (type == 0 && indexArray == 1) {
+						progressLayout.setVisibility(View.GONE);
+						if (mProgressDialog.isShowing()) {
+							mProgressDialog.dismiss();
+						}
+						displayData(listTemperature2, listHumidity2);
+						putDataToSharedPreference();
+						Log.e("display Data", "display Data");
+						// listTemperature2 = new ArrayList<Integer>();
+						// listHumidity2 = new ArrayList<Integer>();
+					}
 				}
 			}
 		}
 	};
 
-	private void displayData() {
+	private void displayData(ArrayList<Integer> listTemperature,
+			ArrayList<Integer> listHumidity) {
 		currentTempTv.setText(listTemperature.get(listTemperature.size() - 1)
 				+ " °C");
 		currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
@@ -392,38 +407,39 @@ public class MainActivity extends Activity implements OnClickListener {
 		return serviceConnection;
 	}
 
-	public void onConnect1Press(View v) {
-		// mDeviceAddress = "D0:FF:50:7C:04:F1";
-		mDeviceAddress = "D0:FF:50:7B:F9:BA";
-		mServiceConnection1 = getConnection(mDeviceAddress);
-		Intent gattServiceIntent = new Intent(MainActivity.this,
-				BluetoothLeService.class);
-		bindService(gattServiceIntent, mServiceConnection1, BIND_AUTO_CREATE);
-	}
-
-	public void onConnect2Press(View v) {
-		mDeviceAddress = "D0:FF:50:7B:F8:48";
-		mServiceConnection2 = getConnection(mDeviceAddress);
-		Intent gattServiceIntent = new Intent(MainActivity.this,
-				BluetoothLeService.class);
-		bindService(gattServiceIntent, mServiceConnection2, BIND_AUTO_CREATE);
-	}
+	// public void onConnect1Press(View v) {
+	// // mDeviceAddress = "D0:FF:50:7C:04:F1";
+	// mDeviceAddress = "D0:FF:50:7B:F9:BA";
+	// mServiceConnection1 = getConnection(mDeviceAddress);
+	// Intent gattServiceIntent = new Intent(MainActivity.this,
+	// BluetoothLeService.class);
+	// bindService(gattServiceIntent, mServiceConnection1, BIND_AUTO_CREATE);
+	// }
+	//
+	// public void onConnect2Press(View v) {
+	// mDeviceAddress = "D0:FF:50:7B:F8:48";
+	// mServiceConnection2 = getConnection(mDeviceAddress);
+	// Intent gattServiceIntent = new Intent(MainActivity.this,
+	// BluetoothLeService.class);
+	// bindService(gattServiceIntent, mServiceConnection2, BIND_AUTO_CREATE);
+	// }
 
 	/**
 	 * Push data to shared preference
 	 */
 	private void putDataToSharedPreference() {
-		sharedPreferences.putList(BluetoothLeService.EXTRA_TEMPERATURE,
-				listTemperature);
-		sharedPreferences.putList(BluetoothLeService.EXTRA_HUMIDITY,
-				listHumidity);
+		sharedPreferences.putList(Utils.LIST_TEMP1, listTemperature1);
+		sharedPreferences.putList(Utils.LIST_TEMP2, listTemperature2);
+		sharedPreferences.putList(Utils.LIST_TEMP3, listTemperature3);
+		sharedPreferences.putList(Utils.LIST_HUMID1, listHumidity1);
+		sharedPreferences.putList(Utils.LIST_HUMID2, listHumidity2);
+		sharedPreferences.putList(Utils.LIST_HUMID3, listHumidity3);
 		sharedPreferences.putLong(Utils.LAST_UPDATED, lastUpdate);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 		// if (mBluetoothLeService != null) {
 		// final boolean result = mBluetoothLeService.connect(mDeviceAddress);
 		// Log.d(TAG, "Connect request result=" + result);
@@ -443,9 +459,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		if (mBluetoothLeService != null) {
 			if (mServiceConnection1 != null) {
 				unbindService(mServiceConnection1);
-			}
-			if (mServiceConnection2 != null) {
-				unbindService(mServiceConnection2);
 			}
 			mBluetoothLeService = null;
 		}
@@ -545,32 +558,22 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	// Device scan callback.
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-		boolean isConnected;
-
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi,
 				byte[] scanRecord) {
-			// runOnUiThread(new Runnable() {
-			// @Override
-			// public void run() {
 			if (device != null && !listDevice.contains(device.getAddress())) {
 				// && device.getAddress().equals("D0:FF:50:7B:F8:48")) {
 				Log.e("device", device.getAddress());
 				listDevice.add(device.getAddress());
 				// mDeviceAddress = "D0:FF:50:7B:F8:48";
 				// mDeviceAddress = "D0:FF:50:7C:04:F1";
-				// if (!isConnected) {
 				mDeviceAddress = device.getAddress();
 				mServiceConnection1 = getConnection(mDeviceAddress);
 				Intent gattServiceIntent = new Intent(MainActivity.this,
 						BluetoothLeService.class);
 				bindService(gattServiceIntent, mServiceConnection1,
 						BIND_AUTO_CREATE);
-				// isConnected = true;
-				// }
 			}
-			// }
-			// });
 		}
 	};
 
