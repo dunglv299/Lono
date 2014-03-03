@@ -151,7 +151,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		tempLayout.setOnClickListener(this);
 		humidityLayout.setOnClickListener(this);
 		progressLayout = (RelativeLayout) findViewById(R.id.progress_layout);
-		progressLayout.setVisibility(View.GONE);
+		progressLayout.setVisibility(View.VISIBLE);
 		// showLine(R.id.btn1);
 	}
 
