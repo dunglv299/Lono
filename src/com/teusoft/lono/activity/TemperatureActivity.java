@@ -64,9 +64,8 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 			listTemp = sharedPreferences.getListInt(Utils.LIST_TEMP3);
 			listHumidity = sharedPreferences.getListInt(Utils.LIST_HUMID3);
 			lastUpdated = sharedPreferences.getLong(Utils.LAST_UPDATED3);
-
 		}
-
+		Log.e("list size", listTemp.size() + "");
 		initView();
 		if (listTemp.size() > 0) {
 			init();
@@ -140,7 +139,7 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 					minValue - 10);
 		} else {
 			if (maxY > 40) {
-				graphView.setManualYAxisBounds(maxValue + minValue / 2, 0);
+				graphView.setManualYAxisBounds(100, 0);
 			} else {
 				graphView.setManualYAxisBounds(40, 0);
 			}

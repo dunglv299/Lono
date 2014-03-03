@@ -54,7 +54,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private final String LIST_UUID = "UUID";
 	private static final int REQUEST_ENABLE_BT = 1;
 
-	private Handler mHandler;
+	private Handler scanHandler;
 	private static final long SCAN_PERIOD = 30000;
 	private BluetoothAdapter mBluetoothAdapter;
 
@@ -82,13 +82,16 @@ public class MainActivity extends Activity implements OnClickListener {
 	ProgressDialog mProgressDialog;
 	private List<String> listDevice;
 	private ServiceConnection mServiceConnection1;
+	private int mInterval = 1 * 60 * 1000;
+	private Handler repeatHandler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		initView();
 		initData();
-		mHandler = new Handler();
+		scanHandler = new Handler();
+		repeatHandler = new Handler();
 		if (!getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_BLUETOOTH_LE)) {
 			Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT)
@@ -111,7 +114,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 		} else {
 			// Start scan
-			scanLeDevice(true);
+			// scanLeDevice(true);
+			startRepeatingScan();
 		}
 
 	}
@@ -439,7 +443,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			mBluetoothLeService = null;
 		}
 		putDataToSharedPreference();
-
+		stopRepeatingScan();
 	}
 
 	private void displayGattServices(List<BluetoothGattService> gattServices) {
@@ -505,7 +509,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void scanLeDevice(final boolean enable) {
 		if (enable) {
 			// Stops scanning after a pre-defined scan period.
-			mHandler.postDelayed(new Runnable() {
+			scanHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
 					Log.e("Stop", "Stop");
@@ -537,18 +541,18 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi,
 				byte[] scanRecord) {
-			if (device != null && !listDevice.contains(device.getAddress())) {
-				Log.e("device", device.getAddress());
-				listDevice.add(device.getAddress());
-				// mDeviceAddress = "D0:FF:50:7B:F8:48";
-				// mDeviceAddress = "D0:FF:50:7C:04:F1";
-				mDeviceAddress = device.getAddress();
-				mServiceConnection1 = getConnection(mDeviceAddress);
-				Intent gattServiceIntent = new Intent(MainActivity.this,
-						BluetoothLeService.class);
-				bindService(gattServiceIntent, mServiceConnection1,
-						BIND_AUTO_CREATE);
-			}
+			// if (device != null && !listDevice.contains(device.getAddress()))
+			// {
+			Log.e("device", device.getAddress());
+			listDevice.add(device.getAddress());
+			// mDeviceAddress = "D0:FF:50:7B:F8:48";
+			// mDeviceAddress = "D0:FF:50:7C:04:F1";
+			mDeviceAddress = device.getAddress();
+			mServiceConnection1 = getConnection(mDeviceAddress);
+			Intent gattServiceIntent = new Intent(MainActivity.this,
+					BluetoothLeService.class);
+			bindService(gattServiceIntent, mServiceConnection1,
+					BIND_AUTO_CREATE);
 		}
 	};
 
@@ -578,5 +582,29 @@ public class MainActivity extends Activity implements OnClickListener {
 			normalTv.setTextColor(getResources().getColor(R.color.color_hight));
 			hightTv.setTextColor(Color.WHITE);
 		}
+	}
+
+	// Create repeat scan
+	Runnable mScanRequest = new Runnable() {
+		@Override
+		public void run() {
+			listTemperature1 = new ArrayList<Integer>();
+			listHumidity1 = new ArrayList<Integer>();
+			listTemperature2 = new ArrayList<Integer>();
+			listHumidity2 = new ArrayList<Integer>();
+			listTemperature3 = new ArrayList<Integer>();
+			listHumidity3 = new ArrayList<Integer>();
+			Log.e("dunglv", "dunglv");
+			scanLeDevice(true);
+			repeatHandler.postDelayed(mScanRequest, mInterval);
+		}
+	};
+
+	private void startRepeatingScan() {
+		mScanRequest.run();
+	}
+
+	private void stopRepeatingScan() {
+		repeatHandler.removeCallbacks(mScanRequest);
 	}
 }
