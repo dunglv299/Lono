@@ -88,6 +88,10 @@ public class MySharedPreferences {
 		}
 	}
 
+	public void clear() {
+		prefsEditor.clear().commit();
+	}
+
 	public List<Integer> getListInt(String key) {
 		ArrayList<Integer> list;
 		try {

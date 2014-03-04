@@ -81,8 +81,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private RelativeLayout progressLayout;
 	ProgressDialog mProgressDialog;
 	private List<String> listDevice;
-	// private ServiceConnection mServiceConnection;
-	private int mInterval = 2 * 60 * 1000;
+	private int mInterval = 5 * 60 * 1000;
 	private Handler repeatHandler;
 	private int mDeviceNumber;
 
@@ -427,13 +426,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onDestroy();
 		// stopService(new Intent(this, BluetoothLeService.class));
 		unregisterReceiver(mGattUpdateReceiver);
+		stopService(new Intent(this, BluetoothLeService.class));
 		if (mBluetoothLeService != null) {
-			if (mServiceConnection != null) {
-				unbindService(mServiceConnection);
-			}
 			mBluetoothLeService = null;
 		}
-		putDataToSharedPreference();
+		sharedPreferences.clear();
 		stopRepeatingScan();
 	}
 
@@ -535,8 +532,6 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (device != null && !listDevice.contains(device.getAddress())) {
 				Log.e("device", device.getAddress());
 				listDevice.add(device.getAddress());
-				// mDeviceAddress = "D0:FF:50:7B:F8:48";
-				// mDeviceAddress = "D0:FF:50:7B:F9:BA";
 				if (device.getAddress().equals(listDevice.get(0))) {
 					connectDevice(0);
 				}
@@ -578,12 +573,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		public void run() {
 			listDevice = new ArrayList<String>();
 			mDeviceNumber = 0;
-			// listTemperature1 = new ArrayList<Integer>();
-			// listHumidity1 = new ArrayList<Integer>();
-			// listTemperature2 = new ArrayList<Integer>();
-			// listHumidity2 = new ArrayList<Integer>();
-			// listTemperature3 = new ArrayList<Integer>();
-			// listHumidity3 = new ArrayList<Integer>();
+			if (listTemperature1.size() > 3000) {
+				listTemperature1 = new ArrayList<Integer>();
+				listHumidity1 = new ArrayList<Integer>();
+				listTemperature2 = new ArrayList<Integer>();
+				listHumidity2 = new ArrayList<Integer>();
+				listTemperature3 = new ArrayList<Integer>();
+				listHumidity3 = new ArrayList<Integer>();
+			}
 			Log.e("Repeat", "Repeat");
 			scanLeDevice(true);
 			repeatHandler.postDelayed(mScanRequest, mInterval);
