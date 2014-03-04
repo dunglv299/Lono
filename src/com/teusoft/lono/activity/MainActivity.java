@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	private Handler scanHandler;
-	private static final long SCAN_PERIOD = 30000;
+	private static final long SCAN_PERIOD = 40000;
 	private BluetoothAdapter mBluetoothAdapter;
 
 	private static final int BUTTONS_SIZE = 3;
@@ -81,9 +81,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	private RelativeLayout progressLayout;
 	ProgressDialog mProgressDialog;
 	private List<String> listDevice;
-	private ServiceConnection mServiceConnection1;
-	private int mInterval = 1 * 60 * 1000;
+	// private ServiceConnection mServiceConnection;
+	private int mInterval = 2 * 60 * 1000;
 	private Handler repeatHandler;
+	private int mDeviceNumber;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -267,53 +268,28 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	// Code to manage Service lifecycle.
-	// private final ServiceConnection mServiceConnection = new
-	// ServiceConnection() {
-	//
-	// @Override
-	// public void onServiceConnected(ComponentName componentName,
-	// IBinder service) {
-	// Log.e("onServiceConnected", "onServiceConnected");
-	// mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
-	// .getService();
-	// if (!mBluetoothLeService.initialize()) {
-	// Log.e(TAG, "Unable to initialize Bluetooth");
-	// finish();
-	// }
-	// // Automatically connects to the device upon successful start-up
-	// // initialization.
-	// mBluetoothLeService.connect(mDeviceAddress);
-	// }
-	//
-	// @Override
-	// public void onServiceDisconnected(ComponentName componentName) {
-	// mBluetoothLeService = null;
-	// }
-	// };
-	public ServiceConnection getConnection(final String address) {
-		ServiceConnection serviceConnection = new ServiceConnection() {
-			@Override
-			public void onServiceConnected(ComponentName componentName,
-					IBinder service) {
-				Log.e("onServiceConnected", "onServiceConnected");
-				mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
-						.getService();
-				if (!mBluetoothLeService.initialize()) {
-					Log.e(TAG, "Unable to initialize Bluetooth");
-					finish();
-				}
-				// Automatically connects to the device upon successful start-up
-				// initialization.
-				mBluetoothLeService.connect(address);
-			}
+	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
-			@Override
-			public void onServiceDisconnected(ComponentName componentName) {
-				// mBluetoothLeService = null;
+		@Override
+		public void onServiceConnected(ComponentName componentName,
+				IBinder service) {
+			Log.e("onServiceConnected", "onServiceConnected");
+			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
+					.getService();
+			if (!mBluetoothLeService.initialize()) {
+				Log.e(TAG, "Unable to initialize Bluetooth");
+				finish();
 			}
-		};
-		return serviceConnection;
-	}
+			// Automatically connects to the device upon successful start-up
+			// initialization.
+			mBluetoothLeService.connect(mDeviceAddress);
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName componentName) {
+			// mBluetoothLeService = null;
+		}
+	};
 
 	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
 		@Override
@@ -327,10 +303,16 @@ public class MainActivity extends Activity implements OnClickListener {
 				Log.e("Disconnected", "Disconnected");
 				mConnected = false;
 				invalidateOptionsMenu();
+				mDeviceNumber++;
+				unbindService(mServiceConnection);
+				if (listDevice.size() > mDeviceNumber) {
+					connectDevice(mDeviceNumber);
+				}
 			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED
 					.equals(action)) {
 				// Show all the supported services and characteristics on the
 				// user interface.
+				mConnected = true;
 				Log.e("Discovered", "Discovered");
 				displayGattServices(mBluetoothLeService
 						.getSupportedGattServices());
@@ -374,6 +356,14 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		}
 	};
+
+	private void connectDevice(int index) {
+		Log.e("connectDevice", (index + 1) + "");
+		mDeviceAddress = listDevice.get(index);
+		Intent gattServiceIntent = new Intent(MainActivity.this,
+				BluetoothLeService.class);
+		bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+	}
 
 	private void displayData(ArrayList<Integer> listTemperature,
 			ArrayList<Integer> listHumidity, long lastUpdate) {
@@ -435,10 +425,11 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		// stopService(new Intent(this, BluetoothLeService.class));
 		unregisterReceiver(mGattUpdateReceiver);
 		if (mBluetoothLeService != null) {
-			if (mServiceConnection1 != null) {
-				unbindService(mServiceConnection1);
+			if (mServiceConnection != null) {
+				unbindService(mServiceConnection);
 			}
 			mBluetoothLeService = null;
 		}
@@ -541,18 +532,15 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi,
 				byte[] scanRecord) {
-			// if (device != null && !listDevice.contains(device.getAddress()))
-			// {
-			Log.e("device", device.getAddress());
-			listDevice.add(device.getAddress());
-			// mDeviceAddress = "D0:FF:50:7B:F8:48";
-			// mDeviceAddress = "D0:FF:50:7C:04:F1";
-			mDeviceAddress = device.getAddress();
-			mServiceConnection1 = getConnection(mDeviceAddress);
-			Intent gattServiceIntent = new Intent(MainActivity.this,
-					BluetoothLeService.class);
-			bindService(gattServiceIntent, mServiceConnection1,
-					BIND_AUTO_CREATE);
+			if (device != null && !listDevice.contains(device.getAddress())) {
+				Log.e("device", device.getAddress());
+				listDevice.add(device.getAddress());
+				// mDeviceAddress = "D0:FF:50:7B:F8:48";
+				// mDeviceAddress = "D0:FF:50:7B:F9:BA";
+				if (device.getAddress().equals(listDevice.get(0))) {
+					connectDevice(0);
+				}
+			}
 		}
 	};
 
@@ -588,13 +576,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	Runnable mScanRequest = new Runnable() {
 		@Override
 		public void run() {
-			listTemperature1 = new ArrayList<Integer>();
-			listHumidity1 = new ArrayList<Integer>();
-			listTemperature2 = new ArrayList<Integer>();
-			listHumidity2 = new ArrayList<Integer>();
-			listTemperature3 = new ArrayList<Integer>();
-			listHumidity3 = new ArrayList<Integer>();
-			Log.e("dunglv", "dunglv");
+			listDevice = new ArrayList<String>();
+			mDeviceNumber = 0;
+			// listTemperature1 = new ArrayList<Integer>();
+			// listHumidity1 = new ArrayList<Integer>();
+			// listTemperature2 = new ArrayList<Integer>();
+			// listHumidity2 = new ArrayList<Integer>();
+			// listTemperature3 = new ArrayList<Integer>();
+			// listHumidity3 = new ArrayList<Integer>();
+			Log.e("Repeat", "Repeat");
 			scanLeDevice(true);
 			repeatHandler.postDelayed(mScanRequest, mInterval);
 		}

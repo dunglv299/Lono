@@ -69,6 +69,10 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 		initView();
 		if (listTemp.size() > 0) {
 			init();
+			if (listTemp.size() > 288) {
+				listTemp = listTemp.subList(listTemp.size() - 289,
+						listTemp.size() - 1);
+			}
 		}
 		showLine(channel - 1);
 	}
