@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	private Handler scanHandler;
-	private static final long SCAN_PERIOD = 40000;
+	private static final long SCAN_PERIOD = 50000;
 	private BluetoothAdapter mBluetoothAdapter;
 
 	private static final int BUTTONS_SIZE = 3;
@@ -529,7 +529,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi,
 				byte[] scanRecord) {
-			if (device != null && !listDevice.contains(device.getAddress())) {
+			if (device != null && !listDevice.contains(device.getAddress())
+					&& device.getName().equals("NGE76")) {
 				Log.e("device", device.getAddress());
 				listDevice.add(device.getAddress());
 				if (device.getAddress().equals(listDevice.get(0))) {
