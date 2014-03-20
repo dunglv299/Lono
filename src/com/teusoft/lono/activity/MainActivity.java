@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	private Handler scanHandler;
-	private static final long SCAN_PERIOD = 50000;
+	private static final long SCAN_PERIOD = 80000;
 	private BluetoothAdapter mBluetoothAdapter;
 
 	private static final int BUTTONS_SIZE = 3;
@@ -366,7 +366,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private void displayData(ArrayList<Integer> listTemperature,
 			ArrayList<Integer> listHumidity, long lastUpdate) {
-		progressLayout.setVisibility(View.GONE);
+		// progressLayout.setVisibility(View.GONE);
 		mProgressDialog.dismiss();
 		Log.e("display Data", "display Data");
 		currentTempTv.setText(listTemperature.get(listTemperature.size() - 1)
@@ -507,6 +507,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 			}, SCAN_PERIOD);
 			mBluetoothAdapter.startLeScan(mLeScanCallback);
+			progressLayout.setVisibility(View.VISIBLE);
 		} else {
 			mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		}
@@ -533,9 +534,14 @@ public class MainActivity extends Activity implements OnClickListener {
 					&& device.getName().equals("NGE76")) {
 				Log.e("device", device.getAddress());
 				listDevice.add(device.getAddress());
-				if (device.getAddress().equals(listDevice.get(0))) {
-					connectDevice(0);
-				}
+				mDeviceAddress = device.getAddress();
+				Intent gattServiceIntent = new Intent(MainActivity.this,
+						BluetoothLeService.class);
+				bindService(gattServiceIntent, mServiceConnection,
+						BIND_AUTO_CREATE);
+				// if (device.getAddress().equals(listDevice.get(0))) {
+				// connectDevice(0);
+				// }
 			}
 		}
 	};

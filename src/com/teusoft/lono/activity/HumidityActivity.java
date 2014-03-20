@@ -1,13 +1,12 @@
 package com.teusoft.lono.activity;
 
-import java.util.Collections;
-
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-
 import com.teusoft.lono.R;
+
+import java.util.Collections;
 
 public class HumidityActivity extends TemperatureActivity implements
 		OnClickListener {
@@ -33,5 +32,6 @@ public class HumidityActivity extends TemperatureActivity implements
 		maxTv.setText(maxValue + " %");
 		averageTv.setText(getAverage(listHumidity) + " %");
 		drawGraph(listHumidity);
+
 	}
 }
