@@ -1,9 +1,5 @@
 package com.teusoft.lono.activity;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -14,7 +10,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.jjoe64.graphview.GraphView.GraphViewData;
 import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.GraphViewSeries.GraphViewSeriesStyle;
@@ -22,6 +17,10 @@ import com.jjoe64.graphview.LineGraphView;
 import com.teusoft.lono.R;
 import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
+
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 public class TemperatureActivity extends Activity implements OnClickListener {
 	Button homeBtn;
@@ -94,14 +93,14 @@ public class TemperatureActivity extends Activity implements OnClickListener {
 	}
 
 	public void init() {
-		nowTv.setText(listTemp.get(listTemp.size() - 1) + " 캜");
+		nowTv.setText(listTemp.get(listTemp.size() - 1) + " 째C");
 		maxValue = Collections.max(listTemp);
 		minValue = Collections.min(listTemp);
-		minTv.setText(minValue + " 캜");
-		maxTv.setText(maxValue + " 캜");
-		averageTv.setText(getAverage(listTemp) + " 캜");
+		minTv.setText(minValue + " 째C");
+		maxTv.setText(maxValue + " 째C");
+		averageTv.setText(getAverage(listTemp) + " 째C");
 		dewPointTv.setText(getDewPoint(listTemp.get(listTemp.size() - 1),
-				listHumidity.get(listHumidity.size() - 1)) + " 캜");
+				listHumidity.get(listHumidity.size() - 1)) + " 째C");
 		drawGraph(listTemp);
 	}
 
