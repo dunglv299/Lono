@@ -1,0 +1,107 @@
+com.jjoe64.graphview.BarGraphView
+com.jjoe64.graphview.BuildConfig
+com.jjoe64.graphview.GraphView:
+    339:344:public GraphView(android.content.Context,android.util.AttributeSet)
+    698:698:public boolean isShowLegend()
+    723:730:public void removeAllSeries()
+    737:740:public void removeSeries(com.jjoe64.graphview.GraphViewSeries)
+    747:752:public void removeSeries(int)
+    759:771:public void scrollToEnd()
+    925:930:public void setViewPort(double,double)
+    317:317:static synthetic void access$26(com.jjoe64.graphview.GraphView,double)
+com.jjoe64.graphview.GraphView$1:
+    856:883:public boolean onScale(com.jjoe64.graphview.compatible.ScaleGestureDetector)
+com.jjoe64.graphview.GraphView$GraphViewConfig
+com.jjoe64.graphview.GraphViewSeries:
+    66:70:public GraphViewSeries(com.jjoe64.graphview.GraphViewDataInterface[])
+    98:109:public void appendData(com.jjoe64.graphview.GraphViewDataInterface,boolean)
+    118:143:public void appendData(com.jjoe64.graphview.GraphViewDataInterface,boolean,int)
+    149:149:public com.jjoe64.graphview.GraphViewSeries$GraphViewSeriesStyle getStyle()
+    157:158:public void removeGraphView(com.jjoe64.graphview.GraphView)
+    166:170:public void resetData(com.jjoe64.graphview.GraphViewDataInterface[])
+com.jjoe64.graphview.GraphViewSeries$GraphViewSeriesStyle:
+    private com.jjoe64.graphview.ValueDependentColor valueDependentColor
+    48:48:public com.jjoe64.graphview.ValueDependentColor getValueDependentColor()
+    57:58:public void setValueDependentColor(com.jjoe64.graphview.ValueDependentColor)
+com.jjoe64.graphview.GraphViewStyle:
+    51:56:public GraphViewStyle(int,int,int)
+    119:120:public void setGridColor(int)
+    127:128:public void setLegendBorder(int)
+    131:132:public void setLegendSpacing(int)
+    139:140:public void setLegendMarginBottom(int)
+    161:162:public void setVerticalLabelsAlign(android.graphics.Paint$Align)
+    172:173:public void setVerticalLabelsWidth(int)
+com.jjoe64.graphview.LineGraphView:
+    41:47:public LineGraphView(android.content.Context,android.util.AttributeSet)
+com.jjoe64.graphview.ValueDependentColor
+com.jjoe64.graphview.compatible.RealScaleGestureDetector:
+    29:35:public RealScaleGestureDetector(android.content.Context,com.jjoe64.graphview.compatible.ScaleGestureDetector,com.jjoe64.graphview.compatible.ScaleGestureDetector$SimpleOnScaleGestureListener)
+com.jjoe64.graphview.compatible.RealScaleGestureDetector$1
+com.jjoe64.graphview.compatible.ScaleGestureDetector:
+    65:73:public double getScaleFactor()
+com.jjoe64.graphview.compatible.ScaleGestureDetector$SimpleOnScaleGestureListener:
+    public abstract boolean onScale(com.jjoe64.graphview.compatible.ScaleGestureDetector)
+com.teusoft.lono.BuildConfig
+com.teusoft.lono.R
+com.teusoft.lono.R$anim
+com.teusoft.lono.R$attr
+com.teusoft.lono.R$color
+com.teusoft.lono.R$dimen
+com.teusoft.lono.R$drawable
+com.teusoft.lono.R$id
+com.teusoft.lono.R$layout
+com.teusoft.lono.R$menu
+com.teusoft.lono.R$string
+com.teusoft.lono.R$style
+com.teusoft.lono.activity.DeviceScanActivity:
+    private static final int REQUEST_ENABLE_BT
+    private static final long SCAN_PERIOD
+com.teusoft.lono.activity.MainActivity:
+    private static final int REQUEST_ENABLE_BT
+    private static final long SCAN_PERIOD
+    private static final int BUTTONS_SIZE
+com.teusoft.lono.activity.TemperatureActivity:
+    private static final int BUTTONS_SIZE
+com.teusoft.lono.customview.CustomDigitalClock:
+    private static final java.lang.String m12
+    private static final java.lang.String m24
+com.teusoft.lono.service.BluetoothLeService:
+    private static final int STATE_DISCONNECTED
+    private static final int STATE_CONNECTING
+    private static final int STATE_CONNECTED
+    public static final java.lang.String ACTION_GATT_CONNECTED
+    public static final java.lang.String ACTION_GATT_DISCONNECTED
+    public static final java.lang.String ACTION_GATT_SERVICES_DISCOVERED
+    public static final java.lang.String ACTION_DATA_AVAILABLE
+    public static final java.lang.String EXTRA_TEMPERATURE
+    public static final java.lang.String EXTRA_HUMIDITY
+    public static final java.lang.String EXTRA_COUNT
+    public static final java.lang.String EXTRA_CHANNEL
+    public static final java.lang.String EXTRA_TYPE
+    254:259:public void disconnect()
+com.teusoft.lono.service.SampleGattAttributes:
+    25:25:public SampleGattAttributes()
+com.teusoft.lono.utils.MySharedPreferences:
+    26:28:public void putInt(java.lang.String,int)
+    32:34:public int getInt(java.lang.String)
+    54:56:public void putBoolean(java.lang.String,boolean)
+    60:62:public boolean getBoolean(java.lang.String)
+    68:70:public void putString(java.lang.String,java.lang.String)
+    74:76:public java.lang.String getString(java.lang.String)
+com.teusoft.lono.utils.ObjectSerializer:
+    10:10:public ObjectSerializer()
+com.teusoft.lono.utils.Utils:
+    public static final java.lang.String LAST_UPDATED1
+    public static final java.lang.String LAST_UPDATED2
+    public static final java.lang.String LAST_UPDATED3
+    public static final java.lang.String CHANNEL
+    public static final java.lang.String LIST_TEMP1
+    public static final java.lang.String LIST_TEMP2
+    public static final java.lang.String LIST_TEMP3
+    public static final java.lang.String LIST_HUMID1
+    public static final java.lang.String LIST_HUMID2
+    public static final java.lang.String LIST_HUMID3
+    6:6:public Utils()
+com.teusoft.lono.utils.WrappedIOException:
+    9:9:public WrappedIOException()
+    12:12:public static java.io.IOException wrap(java.lang.Throwable)

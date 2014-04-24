@@ -20,10 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.teusoft.lono.R;
 import com.teusoft.lono.customview.CustomDigitalClock;
+import com.teusoft.lono.dao.*;
 import com.teusoft.lono.service.BluetoothLeService;
 import com.teusoft.lono.service.SampleGattAttributes;
 import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
+import de.greenrobot.dao.query.Query;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -69,12 +71,14 @@ public class MainActivity extends Activity implements OnClickListener {
     private int mInterval = 5 * 60 * 1000;
     private Handler repeatHandler;
     private int mDeviceNumber;
+    private LonoDao lonoDao;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
-        initData();
+        init();
         scanHandler = new Handler();
         repeatHandler = new Handler();
         if (!getPackageManager().hasSystemFeature(
@@ -99,13 +103,12 @@ public class MainActivity extends Activity implements OnClickListener {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
             // Start scan
-            // scanLeDevice(true);
             startRepeatingScan();
         }
 
     }
 
-    private void initData() {
+    private void init() {
         listTemperature1 = new ArrayList<Integer>();
         listHumidity1 = new ArrayList<Integer>();
         listTemperature2 = new ArrayList<Integer>();
@@ -115,6 +118,9 @@ public class MainActivity extends Activity implements OnClickListener {
         sharedPreferences = new MySharedPreferences(this);
         listDevice = new ArrayList<String>();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        // Init DAO
+        lonoDao = MyDatabaseHelper.getInstance(this).getmSession().getLonoDao();
+
     }
 
     private void initView() {
@@ -319,6 +325,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         lastUpdate1 = System.currentTimeMillis();
                         displayData(listTemperature1, listHumidity1,
                                 lastUpdate1);
+                        insertTemperatureDao(listTemperature1, listHumidity1, channel);
                     }
                 } else if (channel == 2) {
                     listTemperature2.add(temperature);
@@ -327,6 +334,8 @@ public class MainActivity extends Activity implements OnClickListener {
                         lastUpdate2 = System.currentTimeMillis();
                         displayData(listTemperature2, listHumidity2,
                                 lastUpdate2);
+                        insertTemperatureDao(listTemperature2, listHumidity2, channel);
+
                     }
                 } else if (channel == 3) {
                     listTemperature3.add(temperature);
@@ -335,6 +344,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         lastUpdate3 = System.currentTimeMillis();
                         displayData(listTemperature3, listHumidity3,
                                 lastUpdate3);
+                        insertTemperatureDao(listTemperature3, listHumidity3, channel);
                     }
                 }
             }
@@ -376,28 +386,55 @@ public class MainActivity extends Activity implements OnClickListener {
         putDataToSharedPreference();
     }
 
+    private void insertTemperatureDao(final ArrayList<Integer> listTemperature, final ArrayList<Integer> listHumidity, final int channel) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Set timestamp
+                Calendar calendar = Calendar.getInstance();
+                long roundTime = calendar.getTimeInMillis() - (calendar.getTimeInMillis() % (5 * Utils.ONE_MINUTE));
+                calendar.setTimeInMillis(roundTime);
+                Log.e("", calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
+                for (int i = listTemperature.size() - 1; i >= 0; i--) {
+                    Lono lono = new Lono();
+                    lono.setTemperature(listTemperature.get(i));
+                    lono.setHumidity(listHumidity.get(i));
+                    lono.setChannel(channel);
+                    lono.setIndex(i);
+                    // Increate minute from i = 1
+                    if (i < listTemperature.size() - 1) {
+                        calendar.add(Calendar.MINUTE, -5);
+                    }
+//                    Log.e("" + i, calendar.getTimeInMillis() + "");
+//                    Log.e("" + i, calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
+                    lono.setTimeStamp(calendar.getTimeInMillis());
+//                    lono.setTimeStamp(calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
+                    // Check record is exist
+                    Query query = lonoDao.queryBuilder().where(LonoDao.Properties.Channel.eq(channel),
+                            LonoDao.Properties.TimeStamp.eq(calendar.getTimeInMillis())).build();
+//                            TemperatureDao.Properties.Value.eq(lono.getValue())).build();
+
+                    if (query.list().size() == 0) {
+                        lonoDao.insert(lono);
+                    }
+                }
+            }
+        }).start();
+    }
+
     /**
      * Push data to shared preference
      */
     private void putDataToSharedPreference() {
-        sharedPreferences.putList(Utils.LIST_TEMP1, listTemperature1);
-        sharedPreferences.putList(Utils.LIST_TEMP2, listTemperature2);
-        sharedPreferences.putList(Utils.LIST_TEMP3, listTemperature3);
-        sharedPreferences.putList(Utils.LIST_HUMID1, listHumidity1);
-        sharedPreferences.putList(Utils.LIST_HUMID2, listHumidity2);
-        sharedPreferences.putList(Utils.LIST_HUMID3, listHumidity3);
         sharedPreferences.putLong(Utils.LAST_UPDATED1, lastUpdate1);
         sharedPreferences.putLong(Utils.LAST_UPDATED2, lastUpdate2);
         sharedPreferences.putLong(Utils.LAST_UPDATED3, lastUpdate3);
+        sharedPreferences.putLong(Utils.CHANNEL, channel);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // if (mBluetoothLeService != null) {
-        // final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-        // Log.d(TAG, "Connect request result=" + result);
-        // }
     }
 
     @Override
@@ -415,7 +452,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if (mBluetoothLeService != null) {
             mBluetoothLeService = null;
         }
-        sharedPreferences.clear();
+//        sharedPreferences.clear();
         stopRepeatingScan();
     }
 
@@ -506,6 +543,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 && resultCode == Activity.RESULT_CANCELED) {
             finish();
             return;
+        } else {
+            startRepeatingScan();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

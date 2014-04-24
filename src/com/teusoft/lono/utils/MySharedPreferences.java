@@ -1,18 +1,18 @@
 package com.teusoft.lono.utils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MySharedPreferences {
 	private Context context;
 	private SharedPreferences appSharedPrefs;
 	private Editor prefsEditor;
-	private static String nameSharedPreferences = "caldroid";
+	private static String nameSharedPreferences = "lono_data";
 
 	public MySharedPreferences(Context context) {
 		this.context = context;

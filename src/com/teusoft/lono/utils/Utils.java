@@ -16,7 +16,13 @@ public class Utils {
 	public static final String LIST_HUMID2 = "listHumid2";
 	public static final String LIST_HUMID3 = "listHumid3";
 
-	public static Typeface getTypeface(Context context) {
+    public static final String GRAPH_PAGE = "graph_page";
+    public static final long ONE_MINUTE = 60 * 1000;
+    public static final long ONE_DAY = 24 * 60 * 60 * 1000;
+
+
+
+    public static Typeface getTypeface(Context context) {
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),
 				"Exo-DemiBold.ttf");
 		return tf;
