@@ -9,14 +9,14 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import com.teusoft.lono.R;
-import com.teusoft.lono.adapter.GraphPagerAdapter;
+import com.teusoft.lono.adapter.DayGraphPagerAdapter;
+import com.teusoft.lono.adapter.WeekGraphPagerAdapter;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
 import com.teusoft.lono.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,10 +38,9 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
     private List<Lono> lonoList;
 
     private ViewPager mPager;
-    private GraphPagerAdapter mPagerAdapter;
+    private DayGraphPagerAdapter mPagerAdapter;
     public int pageNumber;// Number of page adapter
-    public boolean isTemperatureActivity;
-
+    private boolean isDaySelected;// Select day graph
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,36 +51,57 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
 
         // load list data form database
         lonoDao = MyDatabaseHelper.getInstance(this).getmSession().getLonoDao();
-        setDataToPager(channel);
+        setDataDayGraphToPager(channel);
         showLine(channel - 1);
+        isDaySelected = true;
     }
 
-    public void setDataToPager(int channel) {
+    /**
+     * Set data for day graph
+     *
+     * @param channel
+     */
+    public void setDataDayGraphToPager(int channel) {
         lonoList = lonoDao.queryBuilder()
                 .where(LonoDao.Properties.Channel.eq(channel)).orderDesc(LonoDao.Properties.TimeStamp)
                 .list();
         if (lonoList.size() > 0) {
             // Get number of page
-            pageNumber = (int) ((lonoList.get(0).getTimeStamp() + 5 * Utils.ONE_MINUTE
-                    - lonoList.get(lonoList.size() - 1).getTimeStamp()) / Utils.ONE_DAY);
-            long startDate = lonoList.get(lonoList.size() - 1).getTimeStamp();
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(startDate);
-            c.set(Calendar.HOUR_OF_DAY, 0);
-            c.set(Calendar.MINUTE, 0);
-            long roundStartDate = c.getTimeInMillis();
-            mPagerAdapter = new GraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate, isTemperatureActivity);
+            long roundStartDate = Utils.getRoundDay(lonoList.get(lonoList.size() - 1).getTimeStamp());
+            // Page number is endtime - starttime/ oneday
+            pageNumber = (int) ((Utils.getRoundDay(lonoList.get(0).getTimeStamp()) - roundStartDate) / Utils.ONE_DAY);
+            mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate);
             mPager.setAdapter(mPagerAdapter);
             mPager.setCurrentItem(pageNumber);
         } else {
-            mPagerAdapter = new GraphPagerAdapter(getSupportFragmentManager(), channel, 0, 0, true);
-            mPager.setAdapter(mPagerAdapter);
             resetView();
         }
     }
 
+    /**
+     * Set data for Week Graph
+     *
+     * @param channel
+     */
+    public void setDataWeekGraphToPager(int channel) {
+        lonoList = lonoDao.queryBuilder()
+                .where(LonoDao.Properties.Channel.eq(channel)).orderDesc(LonoDao.Properties.TimeStamp)
+                .list();
+        if (lonoList.size() > 0) {
+            // Get number of page
+            long roundStartDate = Utils.getRoundDay(lonoList.get(lonoList.size() - 1).getTimeStamp());
+            // Page number is endtime - starttime/ oneday
+            pageNumber = (int) ((Utils.getRoundDay(lonoList.get(0).getTimeStamp()) - roundStartDate) / Utils.ONE_WEEK);
+            WeekGraphPagerAdapter mPagerAdapter = new WeekGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate);
+            mPager.setAdapter(mPagerAdapter);
+            mPager.setCurrentItem(pageNumber);
+        } else {
+            resetView();
+        }
+    }
+
+
     public void initView() {
-        isTemperatureActivity = true;
         setFont();
         homeBtn = (Button) findViewById(R.id.home_btn);
         homeBtn.setOnClickListener(this);
@@ -95,17 +115,23 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
             arrayLine[i] = findViewById(arrayLineId[i]);
             arrayButton[i].setOnClickListener(this);
         }
+        findViewById(R.id.dayBtn).setOnClickListener(this);
+        findViewById(R.id.dayBtn).setBackgroundColor(getResources().getColor(R.color.green_text_color));
+        findViewById(R.id.weekBtn).setOnClickListener(this);
         mPager = (ViewPager) findViewById(R.id.view_pager);
     }
 
 
     public void init(List<Lono> lonoList) {
         List<Integer> listTemperature = new ArrayList<Integer>();
+        List<Integer> listHumidity = new ArrayList<Integer>();
+
         if (lonoList.size() == 0) {
             return;
         } else {
             for (Lono lono : lonoList) {
                 listTemperature.add(lono.getTemperature());
+                listHumidity.add(lono.getHumidity());
             }
         }
         nowTv.setText(listTemperature.get(listTemperature.size() - 1) + " °C");
@@ -114,8 +140,8 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
         minTv.setText(minValue + " °C");
         maxTv.setText(maxValue + " °C");
         averageTv.setText(getAverage(listTemperature) + " °C");
-//        dewPointTv.setText(getDewPoint(listTemp.get(listTemp.size() - 1),
-//                listHumidity.get(listHumidity.size() - 1)) + " °C");
+        dewPointTv.setText(getDewPoint(listTemperature.get(listTemperature.size() - 1),
+                listHumidity.get(listHumidity.size() - 1)) + " °C");
     }
 
     public void resetView() {
@@ -124,7 +150,10 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
         maxTv.setText("-- °C");
         averageTv.setText("-- °C");
         dewPointTv.setText("-- °C");
+        mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), channel, 0, 0);
+        mPager.setAdapter(mPagerAdapter);
     }
+
 
     @Override
     public void onClick(View v) {
@@ -133,16 +162,45 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
                 goBack();
                 break;
             case R.id.btn1:
-                setDataToPager(1);
+                if (isDaySelected) {
+                    setDataDayGraphToPager(1);
+                } else {
+                    setDataWeekGraphToPager(1);
+                }
                 showLine(0);
+                channel = 1;
                 break;
             case R.id.btn2:
-                setDataToPager(2);
+                if (isDaySelected) {
+                    setDataDayGraphToPager(2);
+                } else {
+                    setDataWeekGraphToPager(2);
+                }
                 showLine(1);
+                channel = 2;
                 break;
             case R.id.btn3:
-                setDataToPager(3);
+                if (isDaySelected) {
+                    setDataDayGraphToPager(3);
+                } else {
+                    setDataWeekGraphToPager(3);
+                }
                 showLine(2);
+                channel = 3;
+                break;
+            case R.id.dayBtn:
+                isDaySelected = true;
+                setDataDayGraphToPager(channel);
+                findViewById(R.id.dayBtn).setBackgroundColor(getResources().getColor(R.color.green_text_color));
+                findViewById(R.id.weekBtn).setBackgroundColor(0);
+
+                break;
+            case R.id.weekBtn:
+                isDaySelected = false;
+                setDataWeekGraphToPager(channel);
+                findViewById(R.id.weekBtn).setBackgroundColor(getResources().getColor(R.color.green_text_color));
+                findViewById(R.id.dayBtn).setBackgroundColor(0);
+
                 break;
             default:
                 break;

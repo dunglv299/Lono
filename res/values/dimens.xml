@@ -12,6 +12,6 @@
     <dimen name="temp_title_text">20sp</dimen>
     <dimen name="temp_normal_text">16sp</dimen>
     <dimen name="graph_font_size">10sp</dimen>
-    <dimen name="thick_size">2dp</dimen>
+    <dimen name="thick_size">1.5dp</dimen>
 
 </resources>

@@ -24,7 +24,6 @@ public class HumidityActivity extends TemperatureActivity implements
         super.initView();
         ((Button) findViewById(R.id.tv_temperature)).setText(R.string.humidity);
         findViewById(R.id.dewpoint_layout).setVisibility(View.GONE);
-        isTemperatureActivity = false;
     }
 
     public void init(List<Lono> lonoList) {

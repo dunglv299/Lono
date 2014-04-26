@@ -1,5 +1,6 @@
 package fragment;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.LineGraphView;
 import com.teusoft.lono.R;
+import com.teusoft.lono.activity.HumidityActivity;
 import com.teusoft.lono.activity.TemperatureActivity;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
@@ -25,11 +27,10 @@ import java.util.*;
 /**
  * Created by DungLV on 20/4/2014.
  */
-public class GraphFragment extends Fragment {
+public class DayGraphFragment extends Fragment {
     public static final String ARG_PAGE = "page";
     public static final String CHANNEL = "channel";
     public static final String ROUND_STARTDATE = "roundStartDate";
-    public static final String IS_TEMPERATURE = "isTemperature";
 
 
     private int mPageNumber;
@@ -42,15 +43,13 @@ public class GraphFragment extends Fragment {
     private int maxValue, minValue;
     private long roundStartDate;
     private long roundEndDate;
-    private boolean isTemperatureActivity;
 
-    public static GraphFragment create(int pageNumber, int channel, long roundStartDate, boolean isTemperatureActivity) {
-        GraphFragment fragment = new GraphFragment();
+    public static DayGraphFragment create(int pageNumber, int channel, long roundStartDate) {
+        DayGraphFragment fragment = new DayGraphFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, pageNumber);
         args.putInt(CHANNEL, channel);
         args.putLong(ROUND_STARTDATE, roundStartDate);
-        args.putBoolean(IS_TEMPERATURE, isTemperatureActivity);
 
 
         fragment.setArguments(args);
@@ -60,11 +59,10 @@ public class GraphFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isTemperatureActivity = getArguments().getBoolean(IS_TEMPERATURE);
         mPageNumber = getArguments().getInt(ARG_PAGE);
         channel = getArguments().getInt(CHANNEL);
         roundStartDate = getArguments().getLong(ROUND_STARTDATE) + mPageNumber * Utils.ONE_DAY;
-        roundEndDate = roundStartDate + (mPageNumber + 1) * Utils.ONE_DAY;
+        roundEndDate = roundStartDate + Utils.ONE_DAY;
     }
 
     @Override
@@ -84,7 +82,7 @@ public class GraphFragment extends Fragment {
                 .where(LonoDao.Properties.Channel.eq(channel), LonoDao.Properties.TimeStamp.between(roundStartDate, roundEndDate - 1))
                 .orderAsc(LonoDao.Properties.TimeStamp)
                 .list();
-        drawGraph(lonoList, isTemperatureActivity);
+        drawGraph(lonoList);
 
         // Reset textview in activity
         TemperatureActivity activity = (TemperatureActivity) getActivity();
@@ -94,12 +92,21 @@ public class GraphFragment extends Fragment {
         return v;
     }
 
-    public void drawGraph(List<Lono> lonos, boolean isTemperatureActivity) {
+    public int getValue(Lono lono) {
+        Activity mActivity = getActivity();
+        if (mActivity instanceof HumidityActivity) {
+            return lono.getHumidity();
+        } else {
+            return lono.getTemperature();
+        }
+    }
+
+    public void drawGraph(List<Lono> lonos) {
         List<Integer> listData = new ArrayList<Integer>();
         List<Integer> listMinutes = new ArrayList<Integer>();
 
         for (Lono lono : lonos) {
-            listData.add(isTemperatureActivity ? lono.getTemperature() : lono.getHumidity());
+            listData.add(getValue(lono));
             // get minute of day
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(lono.getTimeStamp());
@@ -120,8 +127,8 @@ public class GraphFragment extends Fragment {
 
         // Set data for graph
         for (int i = 0; i < size; i++) {
-            dataGraph1[i] = new GraphView.GraphViewData(listMinutes.get(i),
-                    isTemperatureActivity ? lonos.get(i).getTemperature() : lonos.get(i).getHumidity());
+            dataGraph1[i] = new GraphView.GraphViewData(listMinutes.get(i), getValue(
+                    lonos.get(i)));
         }
         GraphViewSeries seriesData = new GraphViewSeries("dunglv",
                 new GraphViewSeries.GraphViewSeriesStyle(Color.WHITE, (int) getResources()

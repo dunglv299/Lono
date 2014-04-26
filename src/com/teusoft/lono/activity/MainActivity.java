@@ -394,7 +394,6 @@ public class MainActivity extends Activity implements OnClickListener {
                 Calendar calendar = Calendar.getInstance();
                 long roundTime = calendar.getTimeInMillis() - (calendar.getTimeInMillis() % (5 * Utils.ONE_MINUTE));
                 calendar.setTimeInMillis(roundTime);
-                Log.e("", calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
                 for (int i = listTemperature.size() - 1; i >= 0; i--) {
                     Lono lono = new Lono();
                     lono.setTemperature(listTemperature.get(i));
@@ -405,10 +404,7 @@ public class MainActivity extends Activity implements OnClickListener {
                     if (i < listTemperature.size() - 1) {
                         calendar.add(Calendar.MINUTE, -5);
                     }
-//                    Log.e("" + i, calendar.getTimeInMillis() + "");
-//                    Log.e("" + i, calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
                     lono.setTimeStamp(calendar.getTimeInMillis());
-//                    lono.setTimeStamp(calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
                     // Check record is exist
                     Query query = lonoDao.queryBuilder().where(LonoDao.Properties.Channel.eq(channel),
                             LonoDao.Properties.TimeStamp.eq(calendar.getTimeInMillis())).build();
@@ -418,6 +414,8 @@ public class MainActivity extends Activity implements OnClickListener {
                         lonoDao.insert(lono);
                     }
                 }
+                listTemperature.clear();
+                listHumidity.clear();
             }
         }).start();
     }

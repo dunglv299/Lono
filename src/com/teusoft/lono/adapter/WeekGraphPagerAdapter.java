@@ -5,30 +5,30 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
-import fragment.GraphFragment;
+import fragment.WeekGraphFragment;
 
 /**
  * Created by DungLV on 20/4/2014.
  */
-public class GraphPagerAdapter extends FragmentStatePagerAdapter {
+public class WeekGraphPagerAdapter extends FragmentStatePagerAdapter {
     private int pageCount;
     private int channel;
     private long roundStartDate;
-    boolean isTemperatureActivity;
     SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
-    public GraphPagerAdapter(FragmentManager fm, int channel, int pageCount, long roundStartDate, boolean isTemperatureActivity) {
+    public WeekGraphPagerAdapter(FragmentManager fm, int channel, int pageCount, long roundStartDate) {
         super(fm);
         this.pageCount = pageCount;
         this.channel = channel;
         this.roundStartDate = roundStartDate;
-        this.isTemperatureActivity = isTemperatureActivity;
     }
+
 
     @Override
     public Fragment getItem(int position) {
-        return GraphFragment.create(position, channel, roundStartDate,isTemperatureActivity);
+        return WeekGraphFragment.create(position, channel, roundStartDate);
     }
+
 
     @Override
     public int getCount() {
