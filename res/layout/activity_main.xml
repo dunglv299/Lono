@@ -1,257 +1,268 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="100" >
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="12"
-        android:background="@color/white"
-        android:gravity="center" >
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lonometer_logo" />
-    </LinearLayout>
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:weightSum="100">
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="25"
-        android:background="@color/clock" >
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="12"
+            android:background="@color/white">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/main_icon_marginLeft"
-            android:src="@drawable/my_clock" />
-
-        <com.teusoft.lono.customview.CustomDigitalClock
-            android:id="@+id/tv_clock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_large" />
-
-        <RelativeLayout
-            android:id="@+id/progress_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:gravity="center"
-            android:padding="10dp" >
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_centerInParent="true" />
-
-            <TextView
+                android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/progress_bar"
+                android:src="@drawable/lonometer_logo"/>
+
+        <TextView
+                android:id="@+id/exportBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Export"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="20dp"
+                android:layout_alignParentRight="true"
+                android:textSize="20sp"
+                android:textColor="@color/clock"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="25"
+            android:background="@color/clock">
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/main_icon_marginLeft"
+                android:src="@drawable/my_clock"/>
+
+        <com.teusoft.lono.customview.CustomDigitalClock
+                android:id="@+id/tv_clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
-                android:text="Scanning"
+                android:layout_centerVertical="true"
                 android:textColor="@color/white"
-                android:textSize="12sp" />
+                android:textSize="@dimen/main_text_large"/>
+
+        <RelativeLayout
+                android:id="@+id/progress_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:padding="10dp">
+
+            <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"/>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/progress_bar"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:text="Scanning"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"/>
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/tv_lastupdated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="3dp"
-            android:text="@string/last_updated"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:visibility="gone" />
+                android:id="@+id/tv_lastupdated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="3dp"
+                android:text="@string/last_updated"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:visibility="gone"/>
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/temp_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="24"
-        android:background="@color/color_temp" >
+            android:id="@+id/temp_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="24"
+            android:background="@color/color_temp">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/main_icon_marginLeft"
-            android:src="@drawable/my_temp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/main_icon_marginLeft"
+                android:src="@drawable/my_temp"/>
 
         <TextView
-            android:id="@+id/tv_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="-- °C"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_large" />
+                android:id="@+id/tv_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="-- °C"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_large"/>
 
         <TextView
-            android:id="@+id/tv_min"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="2dp"
-            android:text="MIN"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_min"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="2dp"
+                android:text="MIN"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_min_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="30dp"
-            android:layout_toRightOf="@+id/tv_min"
-            android:text="--"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_min_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="30dp"
+                android:layout_toRightOf="@+id/tv_min"
+                android:text="--"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_max_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="2dp"
-            android:text="--"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_max_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="2dp"
+                android:text="--"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_max"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
-            android:text="MAX"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="50dp"
+                android:text="MAX"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/humidity_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="24"
-        android:background="@color/color_humidity" >
+            android:id="@+id/humidity_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="24"
+            android:background="@color/color_humidity">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/main_icon_marginLeft"
-            android:src="@drawable/my_humidity" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/main_icon_marginLeft"
+                android:src="@drawable/my_humidity"/>
 
         <TextView
-            android:id="@+id/tv_humidity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="--%"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_large" />
+                android:id="@+id/tv_humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="--%"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_large"/>
 
         <TextView
-            android:id="@+id/tv_normal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@+id/tv_humidity"
-            android:text="NORMAL"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/tv_humidity"
+                android:text="NORMAL"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_hight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/tv_normal"
-            android:layout_alignLeft="@+id/tv_normal"
-            android:text="HIGH"
-            android:textColor="@color/color_hight"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_hight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/tv_normal"
+                android:layout_alignLeft="@+id/tv_normal"
+                android:text="HIGH"
+                android:textColor="@color/color_hight"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_low"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/tv_normal"
-            android:layout_below="@+id/tv_normal"
-            android:text="LOW"
-            android:textColor="@color/color_hight"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tv_normal"
+                android:layout_below="@+id/tv_normal"
+                android:text="LOW"
+                android:textColor="@color/color_hight"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_min2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="2dp"
-            android:text="MIN"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_min2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="2dp"
+                android:text="MIN"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_min_humidity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="30dp"
-            android:layout_toRightOf="@+id/tv_min2"
-            android:text="--%"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_min_humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="30dp"
+                android:layout_toRightOf="@+id/tv_min2"
+                android:text="--%"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_max_humidity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="2dp"
-            android:text="--%"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_max_humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="2dp"
+                android:text="--%"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
 
         <TextView
-            android:id="@+id/tv_max2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
-            android:text="MAX"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_normal" />
+                android:id="@+id/tv_max2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="50dp"
+                android:text="MAX"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_normal"/>
     </RelativeLayout>
 
     <include
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="15"
-        layout="@layout/bottom_layout" />
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="15"
+            layout="@layout/bottom_layout"/>
 
 </LinearLayout>

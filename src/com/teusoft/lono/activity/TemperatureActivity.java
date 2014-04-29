@@ -7,10 +7,12 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.teusoft.lono.R;
 import com.teusoft.lono.adapter.DayGraphPagerAdapter;
 import com.teusoft.lono.adapter.WeekGraphPagerAdapter;
+import com.teusoft.lono.business.Sharing;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
@@ -41,6 +43,7 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
     private DayGraphPagerAdapter mPagerAdapter;
     public int pageNumber;// Number of page adapter
     private boolean isDaySelected;// Select day graph
+    RelativeLayout mainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +122,9 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
         findViewById(R.id.dayBtn).setBackgroundColor(getResources().getColor(R.color.green_text_color));
         findViewById(R.id.weekBtn).setOnClickListener(this);
         mPager = (ViewPager) findViewById(R.id.view_pager);
+        // Share btn
+        findViewById(R.id.share_btn).setOnClickListener(this);
+        mainLayout = (RelativeLayout) findViewById(R.id.main_layout);
     }
 
 
@@ -200,7 +206,9 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
                 setDataWeekGraphToPager(channel);
                 findViewById(R.id.weekBtn).setBackgroundColor(getResources().getColor(R.color.green_text_color));
                 findViewById(R.id.dayBtn).setBackgroundColor(0);
-
+                break;
+            case R.id.share_btn:
+                new Sharing(this, mainLayout).share();
                 break;
             default:
                 break;

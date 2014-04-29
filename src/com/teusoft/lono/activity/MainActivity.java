@@ -19,8 +19,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.teusoft.lono.R;
+import com.teusoft.lono.business.CSVExport;
 import com.teusoft.lono.customview.CustomDigitalClock;
-import com.teusoft.lono.dao.*;
+import com.teusoft.lono.dao.Lono;
+import com.teusoft.lono.dao.LonoDao;
+import com.teusoft.lono.dao.MyDatabaseHelper;
 import com.teusoft.lono.service.BluetoothLeService;
 import com.teusoft.lono.service.SampleGattAttributes;
 import com.teusoft.lono.utils.MySharedPreferences;
@@ -72,6 +75,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private Handler repeatHandler;
     private int mDeviceNumber;
     private LonoDao lonoDao;
+    private TextView exportBtn;
 
 
     @Override
@@ -148,6 +152,9 @@ public class MainActivity extends Activity implements OnClickListener {
         progressLayout = (RelativeLayout) findViewById(R.id.progress_layout);
         progressLayout.setVisibility(View.VISIBLE);
         // showLine(R.id.btn1);
+        // init export btn
+        exportBtn = (TextView) findViewById(R.id.exportBtn);
+        exportBtn.setOnClickListener(this);
     }
 
     public void setFont() {
@@ -191,6 +198,9 @@ public class MainActivity extends Activity implements OnClickListener {
                 break;
             case R.id.btn3:
                 onButton3Press();
+                break;
+            case R.id.exportBtn:
+                new CSVExport(this, lonoDao).export();
                 break;
             default:
                 break;
@@ -624,4 +634,6 @@ public class MainActivity extends Activity implements OnClickListener {
     private void stopRepeatingScan() {
         repeatHandler.removeCallbacks(mScanRequest);
     }
+
+
 }
