@@ -14,10 +14,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.teusoft.lono.R;
 import com.teusoft.lono.business.CSVExport;
 import com.teusoft.lono.business.MyGattServices;
@@ -26,6 +23,7 @@ import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
 import com.teusoft.lono.service.BluetoothLeService;
+import com.teusoft.lono.utils.LonoDataSharedPreferences;
 import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
 import de.greenrobot.dao.query.Query;
@@ -39,9 +37,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private String mDeviceAddress;
     private BluetoothLeService mBluetoothLeService;
     private boolean mConnected = false;
-
     private static final int REQUEST_ENABLE_BT = 1;
-
     private Handler scanHandler;
     private static final long SCAN_PERIOD = 80000;
     private BluetoothAdapter mBluetoothAdapter;
@@ -64,7 +60,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private ArrayList<Integer> listTemperature3;
     private ArrayList<Integer> listHumidity3;
     private int channel;
-    private MySharedPreferences sharedPreferences;
+    private LonoDataSharedPreferences lonoDataSharedPreferences;
+    private MySharedPreferences mySharedPreferences;
     private long lastUpdate1, lastUpdate2, lastUpdate3;
     private RelativeLayout progressLayout;
     private List<String> listDevice;
@@ -74,6 +71,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private LonoDao lonoDao;
     private TextView exportBtn, scanningTextView;
     private MyGattServices myGattServices;
+    private ToggleButton mDegreeToggle;
+    private boolean isDegreeF;
 
 
     @Override
@@ -110,21 +109,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     }
 
-    private void init() {
-        listTemperature1 = new ArrayList<Integer>();
-        listHumidity1 = new ArrayList<Integer>();
-        listTemperature2 = new ArrayList<Integer>();
-        listHumidity2 = new ArrayList<Integer>();
-        listTemperature3 = new ArrayList<Integer>();
-        listHumidity3 = new ArrayList<Integer>();
-        sharedPreferences = new MySharedPreferences(this);
-        listDevice = new ArrayList<String>();
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        // Init DAO
-        lonoDao = MyDatabaseHelper.getInstance(this).getmSession().getLonoDao();
-
-    }
-
     private void initView() {
         setContentView(R.layout.activity_main);
         currentTempTv = (TextView) findViewById(R.id.tv_temp);
@@ -154,6 +138,29 @@ public class MainActivity extends Activity implements OnClickListener {
         // init export btn
         exportBtn = (TextView) findViewById(R.id.exportBtn);
         exportBtn.setOnClickListener(this);
+        mDegreeToggle = (ToggleButton) findViewById(R.id.degree_toggle);
+        mDegreeToggle.setOnClickListener(this);
+    }
+
+    private void init() {
+        listTemperature1 = new ArrayList<Integer>();
+        listHumidity1 = new ArrayList<Integer>();
+        listTemperature2 = new ArrayList<Integer>();
+        listHumidity2 = new ArrayList<Integer>();
+        listTemperature3 = new ArrayList<Integer>();
+        listHumidity3 = new ArrayList<Integer>();
+        lonoDataSharedPreferences = new LonoDataSharedPreferences(this);
+        mySharedPreferences = new MySharedPreferences(this);
+        listDevice = new ArrayList<String>();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        // Init DAO
+        lonoDao = MyDatabaseHelper.getInstance(this).getmSession().getLonoDao();
+        // Setting C/F degree
+        isDegreeF = mySharedPreferences.getBoolean(Utils.DEGREE_TYPE);
+        mDegreeToggle.setChecked(isDegreeF);
+        Utils.changeTextDegreeType(currentTempTv, isDegreeF);
+        Utils.changeTextDegreeType(minTempTv, isDegreeF);
+        Utils.changeTextDegreeType(maxTempTv, isDegreeF);
     }
 
     public void setFont() {
@@ -199,7 +206,10 @@ public class MainActivity extends Activity implements OnClickListener {
                 onButton3Press();
                 break;
             case R.id.exportBtn:
-                new CSVExport(this, lonoDao).export();
+                new CSVExport(this, lonoDao, isDegreeF).export();
+                break;
+            case R.id.degree_toggle:
+                onToggleClicked(v);
                 break;
             default:
                 break;
@@ -246,8 +256,8 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void onButton1Press() {
-        ArrayList<Integer> listTemperature = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_TEMP1);
-        ArrayList<Integer> listHumidity = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_HUMID1);
+        ArrayList<Integer> listTemperature = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt(Utils.LIST_TEMP1);
+        ArrayList<Integer> listHumidity = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt(Utils.LIST_HUMID1);
         if (listTemperature.size() > 0) {
             channel = 1;
             displayData(listTemperature, listHumidity, lastUpdate1);
@@ -255,8 +265,8 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void onButton2Press() {
-        ArrayList<Integer> listTemperature = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_TEMP2);
-        ArrayList<Integer> listHumidity = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_HUMID2);
+        ArrayList<Integer> listTemperature = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt(Utils.LIST_TEMP2);
+        ArrayList<Integer> listHumidity = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt(Utils.LIST_HUMID2);
         if (listTemperature.size() > 0) {
             channel = 2;
             displayData(listTemperature, listHumidity, lastUpdate2);
@@ -264,8 +274,8 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void onButton3Press() {
-        ArrayList<Integer> listTemperature = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_TEMP3);
-        ArrayList<Integer> listHumidity = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_HUMID3);
+        ArrayList<Integer> listTemperature = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt(Utils.LIST_TEMP3);
+        ArrayList<Integer> listHumidity = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt(Utils.LIST_HUMID3);
         if (listTemperature.size() > 0) {
             channel = 3;
             displayData(listTemperature, listHumidity, lastUpdate3);
@@ -276,8 +286,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
-        public void onServiceConnected(ComponentName componentName,
-                                       IBinder service) {
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
             Log.e("onServiceConnected", "onServiceConnected");
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
                     .getService();
@@ -378,14 +387,23 @@ public class MainActivity extends Activity implements OnClickListener {
     private void displayData(ArrayList<Integer> listTemperature,
                              ArrayList<Integer> listHumidity, long lastUpdate) {
         Log.e("display Data", "display Data");
-        currentTempTv.setText(listTemperature.get(listTemperature.size() - 1) + " °C");
+        int currentTemp = listTemperature.get(listTemperature.size() - 1);
+        if (isDegreeF) {
+            currentTempTv.setText(Utils.getFValue(currentTemp) + " °F");
+            minTempTv.setText(Utils.getFValue(Collections.min(listTemperature)) + " °F");
+            maxTempTv.setText(Utils.getFValue(Collections.max(listTemperature)) + " °F");
+
+
+        } else {
+            currentTempTv.setText(currentTemp + " °C");
+            minTempTv.setText(Collections.min(listTemperature) + " °C");
+            maxTempTv.setText(Collections.max(listTemperature) + " °C");
+
+        }
         currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1) + " %");
         Log.e("size", listTemperature.size() + "");
         showLine(arrayButtonId[channel - 1]);
 
-        // Set min max textview
-        minTempTv.setText(Collections.min(listTemperature) + " °C");
-        maxTempTv.setText(Collections.max(listTemperature) + " °C");
         minHumidityTv.setText(Collections.min(listHumidity) + " %");
         maxHumidityTv.setText(Collections.max(listHumidity) + " %");
         setHumidityRange(listHumidity.get(listHumidity.size() - 1));
@@ -439,16 +457,16 @@ public class MainActivity extends Activity implements OnClickListener {
      */
     private void putDataToSharedPreference(ArrayList<Integer> listTemperature, ArrayList<Integer> listHumidity) {
         if (channel == 1) {
-            sharedPreferences.putList(Utils.LIST_TEMP1, listTemperature);
-            sharedPreferences.putList(Utils.LIST_HUMID1, listHumidity);
+            lonoDataSharedPreferences.putList(Utils.LIST_TEMP1, listTemperature);
+            lonoDataSharedPreferences.putList(Utils.LIST_HUMID1, listHumidity);
         } else if (channel == 2) {
-            sharedPreferences.putList(Utils.LIST_TEMP2, listTemperature);
-            sharedPreferences.putList(Utils.LIST_HUMID2, listHumidity);
+            lonoDataSharedPreferences.putList(Utils.LIST_TEMP2, listTemperature);
+            lonoDataSharedPreferences.putList(Utils.LIST_HUMID2, listHumidity);
         } else if (channel == 3) {
-            sharedPreferences.putList(Utils.LIST_TEMP3, listTemperature);
-            sharedPreferences.putList(Utils.LIST_HUMID3, listHumidity);
+            lonoDataSharedPreferences.putList(Utils.LIST_TEMP3, listTemperature);
+            lonoDataSharedPreferences.putList(Utils.LIST_HUMID3, listHumidity);
         }
-        sharedPreferences.putLong(Utils.CHANNEL, channel);
+        lonoDataSharedPreferences.putLong(Utils.CHANNEL, channel);
     }
 
     @Override
@@ -471,7 +489,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if (mBluetoothLeService != null) {
             mBluetoothLeService = null;
         }
-        sharedPreferences.clear();
+        lonoDataSharedPreferences.clear();
         stopRepeatingScan();
     }
 
@@ -575,5 +593,19 @@ public class MainActivity extends Activity implements OnClickListener {
         repeatHandler.removeCallbacks(mScanRequest);
     }
 
+    public void onToggleClicked(View view) {
+        // Is the toggle on?
+        isDegreeF = ((ToggleButton) view).isChecked();
+        mySharedPreferences.putBoolean(Utils.DEGREE_TYPE, isDegreeF);
+        // Redisplay
+        ArrayList<Integer> listTemperature = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt("listTemp" + channel);
+        ArrayList<Integer> listHumidity = (ArrayList<Integer>) lonoDataSharedPreferences.getListInt("listHumid" + channel);
+        if (listTemperature.size() > 0) {
+            displayData(listTemperature, listHumidity, 0);
+        }
+        Utils.changeTextDegreeType(currentTempTv, isDegreeF);
+        Utils.changeTextDegreeType(minTempTv, isDegreeF);
+        Utils.changeTextDegreeType(maxTempTv, isDegreeF);
+    }
 
 }

@@ -15,18 +15,21 @@ public class DayGraphPagerAdapter extends FragmentStatePagerAdapter {
     private int channel;
     private long roundStartDate;
     SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+    private boolean isDegreeF;
 
-    public DayGraphPagerAdapter(FragmentManager fm, int channel, int pageCount, long roundStartDate) {
+
+    public DayGraphPagerAdapter(FragmentManager fm, int channel, int pageCount, long roundStartDate, boolean isDegreeF) {
         super(fm);
         this.pageCount = pageCount;
         this.channel = channel;
         this.roundStartDate = roundStartDate;
+        this.isDegreeF = isDegreeF;
     }
 
 
     @Override
     public Fragment getItem(int position) {
-        return DayGraphFragment.create(position, channel, roundStartDate);
+        return DayGraphFragment.create(position, channel, roundStartDate, isDegreeF);
     }
 
 

@@ -43,15 +43,16 @@ public class DayGraphFragment extends Fragment {
     private int maxValue, minValue;
     private long roundStartDate;
     private long roundEndDate;
+    private boolean isDegreeF;
 
-    public static DayGraphFragment create(int pageNumber, int channel, long roundStartDate) {
+
+    public static DayGraphFragment create(int pageNumber, int channel, long roundStartDate, boolean isDegreeF) {
         DayGraphFragment fragment = new DayGraphFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, pageNumber);
         args.putInt(CHANNEL, channel);
         args.putLong(ROUND_STARTDATE, roundStartDate);
-
-
+        args.putBoolean(Utils.DEGREE_TYPE, isDegreeF);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,6 +64,7 @@ public class DayGraphFragment extends Fragment {
         channel = getArguments().getInt(CHANNEL);
         roundStartDate = getArguments().getLong(ROUND_STARTDATE) + mPageNumber * Utils.ONE_DAY;
         roundEndDate = roundStartDate + Utils.ONE_DAY;
+        isDegreeF = getArguments().getBoolean(Utils.DEGREE_TYPE);
     }
 
     @Override
@@ -72,8 +74,11 @@ public class DayGraphFragment extends Fragment {
         View v = inflater
                 .inflate(R.layout.fragment_graph, container, false);
         TextView pageNumberTv = (TextView) v.findViewById(R.id.pageNumber);
-        pageNumberTv.setText("" + new SimpleDateFormat("dd/MM/yyyy").format(new Date(roundStartDate)));
-
+        if (!isDegreeF) {
+            pageNumberTv.setText("" + new SimpleDateFormat("dd/MM/yyyy").format(new Date(roundStartDate)));
+        } else {
+            pageNumberTv.setText("" + new SimpleDateFormat("MM/dd/yyyy").format(new Date(roundStartDate)));
+        }
         graphLayout = (LinearLayout) v.findViewById(R.id.graph_layout);
 
         // load data from database
@@ -97,6 +102,9 @@ public class DayGraphFragment extends Fragment {
         if (mActivity instanceof HumidityActivity) {
             return lono.getHumidity();
         } else {
+            if (isDegreeF) {
+                return Utils.getFValue(lono.getTemperature());
+            }
             return lono.getTemperature();
         }
     }

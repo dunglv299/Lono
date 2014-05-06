@@ -16,6 +16,7 @@ import com.teusoft.lono.business.Sharing;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
+import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
 
 import java.util.ArrayList;
@@ -44,7 +45,9 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
     public DayGraphPagerAdapter mPagerAdapter;
     public int pageNumber;// Number of page adapter
     private boolean isDaySelected;// Select day graph
+    private boolean isDegreeF; // Degree C or F
     RelativeLayout mainLayout;
+    private MySharedPreferences mySharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +55,8 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
         setContentView(R.layout.activity_temperature);
         initView();
         channel = getIntent().getExtras().getInt(Utils.CHANNEL);
-
+        mySharedPreferences = new MySharedPreferences(this);
+        isDegreeF = mySharedPreferences.getBoolean(Utils.DEGREE_TYPE);
         // load list data form database
         lonoDao = MyDatabaseHelper.getInstance(this).getmSession().getLonoDao();
         setDataDayGraphToPager(channel);
@@ -74,7 +78,7 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
             long roundStartDate = Utils.getRoundDay(lonoList.get(lonoList.size() - 1).getTimeStamp());
             // Page number is endtime - starttime/ oneday
             pageNumber = (int) ((Utils.getRoundDay(lonoList.get(0).getTimeStamp()) - roundStartDate) / Utils.ONE_DAY);
-            mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate);
+            mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate, isDegreeF);
             mPager.setAdapter(mPagerAdapter);
             mPager.setCurrentItem(pageNumber);
         } else {
@@ -101,7 +105,7 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
             calendar.setTimeInMillis(roundStartDate);
             pageNumber = endWeek - calendar.get(Calendar.WEEK_OF_YEAR);
             WeekGraphPagerAdapter
-                    mPagerAdapter = new WeekGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate);
+                    mPagerAdapter = new WeekGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate, isDegreeF);
             mPager.setAdapter(mPagerAdapter);
             mPager.setCurrentItem(pageNumber);
         } else {
@@ -142,18 +146,27 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
             return;
         } else {
             for (Lono lono : lonoList) {
-                listTemperature.add(lono.getTemperature());
+                if (isDegreeF) {
+                    listTemperature.add(Utils.getFValue(lono.getTemperature()));
+                } else {
+                    listTemperature.add(lono.getTemperature());
+                }
                 listHumidity.add(lono.getHumidity());
             }
         }
-        nowTv.setText(listTemperature.get(listTemperature.size() - 1) + " °C");
         maxValue = Collections.max(listTemperature);
         minValue = Collections.min(listTemperature);
+        nowTv.setText(listTemperature.get(listTemperature.size() - 1) + " °C");
         minTv.setText(minValue + " °C");
         maxTv.setText(maxValue + " °C");
         averageTv.setText(getAverage(listTemperature) + " °C");
         dewPointTv.setText(getDewPoint(listTemperature.get(listTemperature.size() - 1),
                 listHumidity.get(listHumidity.size() - 1)) + " °C");
+        Utils.changeTextDegreeType(nowTv, isDegreeF);
+        Utils.changeTextDegreeType(minTv, isDegreeF);
+        Utils.changeTextDegreeType(maxTv, isDegreeF);
+        Utils.changeTextDegreeType(averageTv, isDegreeF);
+        Utils.changeTextDegreeType(dewPointTv, isDegreeF);
     }
 
     public void resetView() {
@@ -162,7 +175,12 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
         maxTv.setText("-- °C");
         averageTv.setText("-- °C");
         dewPointTv.setText("-- °C");
-        mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), channel, 0, 0);
+        Utils.changeTextDegreeType(nowTv, isDegreeF);
+        Utils.changeTextDegreeType(minTv, isDegreeF);
+        Utils.changeTextDegreeType(maxTv, isDegreeF);
+        Utils.changeTextDegreeType(averageTv, isDegreeF);
+        Utils.changeTextDegreeType(dewPointTv, isDegreeF);
+        mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), channel, 0, 0, false);
         mPager.setAdapter(mPagerAdapter);
     }
 

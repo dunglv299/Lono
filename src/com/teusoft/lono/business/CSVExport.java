@@ -13,6 +13,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.teusoft.lono.R;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
+import com.teusoft.lono.utils.Utils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,10 +29,12 @@ public class CSVExport {
     private Context context;
     private LonoDao lonoDao;
     private File exportFile;
+    private boolean isDegreeF;
 
-    public CSVExport(Context context, LonoDao lonoDao) {
+    public CSVExport(Context context, LonoDao lonoDao, boolean isDegreeF) {
         this.context = context;
         this.lonoDao = lonoDao;
+        this.isDegreeF = isDegreeF;
     }
 
     public void export() {
@@ -70,14 +73,25 @@ public class CSVExport {
                 exportFile.createNewFile();
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(exportFile));
                 List<Lono> listData = lonoDao.queryBuilder().orderAsc(LonoDao.Properties.Channel).orderDesc(LonoDao.Properties.TimeStamp).list();
-
-                String arrStr1[] = {"Channel", "Temperature", "Humidity", "TimeStamp"};
-                csvWrite.writeNext(arrStr1);
-                if (listData.size() > 1) {
-                    for (int index = 0; index < listData.size(); index++) {
-                        Lono lono = listData.get(index);
-                        String arrStr[] = {getTextData(lono.getChannel()), getTextData(lono.getTemperature()), getTextData(lono.getHumidity()), convertTimeStamp(lono.getTimeStamp())};
-                        csvWrite.writeNext(arrStr);
+                if (!isDegreeF) {
+                    String arrStr1[] = {"Channel", "Temperature (Celsius degrees)", "Humidity", "TimeStamp"};
+                    csvWrite.writeNext(arrStr1);
+                    if (listData.size() > 1) {
+                        for (int index = 0; index < listData.size(); index++) {
+                            Lono lono = listData.get(index);
+                            String arrStr[] = {getTextData(lono.getChannel()), getTextData(lono.getTemperature()), getTextData(lono.getHumidity()), convertTimeStamp(lono.getTimeStamp())};
+                            csvWrite.writeNext(arrStr);
+                        }
+                    }
+                } else {
+                    String arrStr1[] = {"Channel", "Temperature (Fahrenheit degrees)", "Humidity", "TimeStamp"};
+                    csvWrite.writeNext(arrStr1);
+                    if (listData.size() > 1) {
+                        for (int index = 0; index < listData.size(); index++) {
+                            Lono lono = listData.get(index);
+                            String arrStr[] = {getTextData(lono.getChannel()), getTextData(Utils.getFValue(lono.getTemperature())), getTextData(lono.getHumidity()), convertTimeStamp(lono.getTimeStamp())};
+                            csvWrite.writeNext(arrStr);
+                        }
                     }
                 }
                 csvWrite.close();

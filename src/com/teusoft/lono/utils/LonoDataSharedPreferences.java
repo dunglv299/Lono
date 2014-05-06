@@ -4,13 +4,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-public class MySharedPreferences {
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LonoDataSharedPreferences {
 	private Context context;
 	private SharedPreferences appSharedPrefs;
 	private Editor prefsEditor;
-	private static String nameSharedPreferences = "my_data";
+	private static String nameSharedPreferences = "lono_data";
 
-	public MySharedPreferences(Context context) {
+	public LonoDataSharedPreferences(Context context) {
 		this.context = context;
 		appSharedPrefs = this.context.getSharedPreferences(
 				nameSharedPreferences, Context.MODE_PRIVATE);
@@ -73,8 +77,32 @@ public class MySharedPreferences {
 		}
 	}
 
+	public void putList(String key, ArrayList<?> listData) {
+		// save the task list to preference
+		try {
+			prefsEditor.putString(key, ObjectSerializer.serialize(listData));
+			prefsEditor.commit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public void clear() {
 		prefsEditor.clear().commit();
 	}
 
+	public List<Integer> getListInt(String key) {
+		ArrayList<Integer> list;
+		try {
+			list = (ArrayList<Integer>) ObjectSerializer
+					.deserialize(appSharedPrefs.getString(key, ObjectSerializer
+							.serialize(new ArrayList<Integer>())));
+			return list;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

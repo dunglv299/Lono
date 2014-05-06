@@ -21,10 +21,8 @@ import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
 import com.teusoft.lono.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by DungLV on 20/4/2014.
@@ -46,14 +44,16 @@ public class WeekGraphFragment extends Fragment {
     private long roundStartDate;
     private long roundStartWeek;
     private long roundEndWeek;
+    private boolean isDegreeF;
 
-    public static WeekGraphFragment create(int pageNumber, int channel, long roundStartDate) {
+
+    public static WeekGraphFragment create(int pageNumber, int channel, long roundStartDate, boolean isDegreeF) {
         WeekGraphFragment fragment = new WeekGraphFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, pageNumber);
         args.putInt(CHANNEL, channel);
         args.putLong(ROUND_STARTDATE, roundStartDate);
-
+        args.putBoolean(Utils.DEGREE_TYPE, isDegreeF);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,6 +66,7 @@ public class WeekGraphFragment extends Fragment {
         roundStartDate = getArguments().getLong(ROUND_STARTDATE) + mPageNumber * Utils.ONE_WEEK;
         roundStartWeek = Utils.getRoundWeek(roundStartDate);
         roundEndWeek = roundStartWeek + (mPageNumber + 1) * Utils.ONE_WEEK;
+        isDegreeF = getArguments().getBoolean(Utils.DEGREE_TYPE);
     }
 
     @Override
@@ -75,7 +76,12 @@ public class WeekGraphFragment extends Fragment {
         View v = inflater
                 .inflate(R.layout.fragment_graph, container, false);
         TextView pageNumberTv = (TextView) v.findViewById(R.id.pageNumber);
-        pageNumberTv.setText("Week: " + mPageNumber);
+        if (!isDegreeF) {
+            pageNumberTv.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(roundStartWeek)) + " - " + new SimpleDateFormat("dd/MM/yyyy").format(new Date(roundEndWeek - 1)));
+        }
+        else{
+            pageNumberTv.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(roundStartWeek)) + " - " + new SimpleDateFormat("MM/dd/yyyy").format(new Date(roundEndWeek - 1)));
+        }
         graphLayout = (LinearLayout) v.findViewById(R.id.graph_layout);
 
         // load data from database
@@ -99,6 +105,9 @@ public class WeekGraphFragment extends Fragment {
         if (mActivity instanceof HumidityActivity) {
             return lono.getHumidity();
         } else {
+            if (isDegreeF) {
+                return Utils.getFValue(lono.getTemperature());
+            }
             return lono.getTemperature();
         }
     }

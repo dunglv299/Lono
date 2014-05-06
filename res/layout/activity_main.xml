@@ -11,13 +11,15 @@
             android:layout_weight="12"
             android:background="@color/white">
 
-        <Switch
+        <ToggleButton
+                android:id="@+id/degree_toggle"
                 android:layout_centerVertical="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                android:textOff="°C"
-                android:textOn="°F"/>
+                android:layout_width="70dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="25dp"
+                android:textOn=""
+                android:textOff=""
+                android:background="@drawable/ic_toggle"/>
 
         <ImageView
                 android:layout_centerInParent="true"
@@ -119,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="-- °C"
+                android:text="--C"
                 android:textColor="@color/white"
                 android:textSize="@dimen/main_text_large"/>
 
@@ -141,7 +143,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginLeft="30dp"
                 android:layout_toRightOf="@+id/tv_min"
-                android:text="--"
+                android:text="--C"
                 android:textColor="@color/white"
                 android:textSize="@dimen/main_text_normal"/>
 
@@ -152,7 +154,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="2dp"
-                android:text="--"
+                android:text="--C"
                 android:textColor="@color/white"
                 android:textSize="@dimen/main_text_normal"/>
 

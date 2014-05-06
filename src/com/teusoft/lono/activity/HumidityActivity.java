@@ -43,13 +43,14 @@ public class HumidityActivity extends TemperatureActivity implements
         maxTv.setText(maxValue + " %");
         averageTv.setText(getAverage(listHumidity) + " %");
     }
+
     public void resetView() {
         nowTv.setText("-- %");
         minTv.setText("-- %");
         maxTv.setText("-- %");
         averageTv.setText("-- %");
         dewPointTv.setText("-- %");
-        mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), 0, 0, 0);
+        mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), 0, 0, 0, false);
         mPager.setAdapter(mPagerAdapter);
     }
 }

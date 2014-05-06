@@ -14,19 +14,22 @@ public class WeekGraphPagerAdapter extends FragmentStatePagerAdapter {
     private int pageCount;
     private int channel;
     private long roundStartDate;
+    private boolean isDegreeF;
+
     SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
-    public WeekGraphPagerAdapter(FragmentManager fm, int channel, int pageCount, long roundStartDate) {
+    public WeekGraphPagerAdapter(FragmentManager fm, int channel, int pageCount, long roundStartDate, boolean isDegreeF) {
         super(fm);
         this.pageCount = pageCount;
         this.channel = channel;
         this.roundStartDate = roundStartDate;
+        this.isDegreeF = isDegreeF;
     }
 
 
     @Override
     public Fragment getItem(int position) {
-        return WeekGraphFragment.create(position, channel, roundStartDate);
+        return WeekGraphFragment.create(position, channel, roundStartDate,isDegreeF);
     }
 
 

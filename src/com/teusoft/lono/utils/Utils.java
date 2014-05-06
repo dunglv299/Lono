@@ -2,6 +2,7 @@ package com.teusoft.lono.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.widget.TextView;
 
 import java.util.Calendar;
 
@@ -17,8 +18,9 @@ public class Utils {
     public static final String LIST_HUMID1 = "listHumid1";
     public static final String LIST_HUMID2 = "listHumid2";
     public static final String LIST_HUMID3 = "listHumid3";
+    public static final String DEGREE_TYPE = "degreeType";
 
-    public static final String GRAPH_PAGE = "graph_page";
+
     public static final long ONE_MINUTE = 60 * 1000;
     public static final long ONE_DAY = 24 * 60 * 60 * 1000;
     public static final long ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -45,5 +47,16 @@ public class Utils {
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         return c.getTimeInMillis();
+    }
+
+    public static int getFValue(int cValue) {
+        return cValue * 9 / 5 + 32;
+    }
+    public static void changeTextDegreeType(TextView mTextView, boolean isDegreeF){
+        if (isDegreeF){
+            mTextView.setText(mTextView.getText().toString().replace("C", "F"));
+        }else{
+            mTextView.setText(mTextView.getText().toString().replace("F", "C"));
+        }
     }
 }
