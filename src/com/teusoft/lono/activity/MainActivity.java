@@ -1,9 +1,9 @@
 package com.teusoft.lono.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.bluetooth.*;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -20,12 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.teusoft.lono.R;
 import com.teusoft.lono.business.CSVExport;
+import com.teusoft.lono.business.MyGattServices;
 import com.teusoft.lono.customview.CustomDigitalClock;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
 import com.teusoft.lono.service.BluetoothLeService;
-import com.teusoft.lono.service.SampleGattAttributes;
 import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
 import de.greenrobot.dao.query.Query;
@@ -38,10 +38,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private final static String TAG = MainActivity.class.getSimpleName();
     private String mDeviceAddress;
     private BluetoothLeService mBluetoothLeService;
-    private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
     private boolean mConnected = false;
-    private final String LIST_NAME = "NAME";
-    private final String LIST_UUID = "UUID";
+
     private static final int REQUEST_ENABLE_BT = 1;
 
     private Handler scanHandler;
@@ -69,13 +67,13 @@ public class MainActivity extends Activity implements OnClickListener {
     private MySharedPreferences sharedPreferences;
     private long lastUpdate1, lastUpdate2, lastUpdate3;
     private RelativeLayout progressLayout;
-    ProgressDialog mProgressDialog;
     private List<String> listDevice;
     private int mInterval = 5 * 60 * 1000;
     private Handler repeatHandler;
     private int mDeviceNumber;
     private LonoDao lonoDao;
-    private TextView exportBtn;
+    private TextView exportBtn, scanningTextView;
+    private MyGattServices myGattServices;
 
 
     @Override
@@ -150,6 +148,7 @@ public class MainActivity extends Activity implements OnClickListener {
         tempLayout.setOnClickListener(this);
         humidityLayout.setOnClickListener(this);
         progressLayout = (RelativeLayout) findViewById(R.id.progress_layout);
+        scanningTextView = (TextView) findViewById(R.id.scanning_textView);
         progressLayout.setVisibility(View.VISIBLE);
         // showLine(R.id.btn1);
         // init export btn
@@ -247,23 +246,29 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void onButton1Press() {
-        if (listTemperature1.size() > 0) {
+        ArrayList<Integer> listTemperature = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_TEMP1);
+        ArrayList<Integer> listHumidity = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_HUMID1);
+        if (listTemperature.size() > 0) {
             channel = 1;
-            displayData(listTemperature1, listHumidity1, lastUpdate1);
+            displayData(listTemperature, listHumidity, lastUpdate1);
         }
     }
 
     private void onButton2Press() {
-        if (listTemperature2.size() > 0) {
+        ArrayList<Integer> listTemperature = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_TEMP2);
+        ArrayList<Integer> listHumidity = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_HUMID2);
+        if (listTemperature.size() > 0) {
             channel = 2;
-            displayData(listTemperature2, listHumidity2, lastUpdate2);
+            displayData(listTemperature, listHumidity, lastUpdate2);
         }
     }
 
     private void onButton3Press() {
-        if (listTemperature3.size() > 0) {
+        ArrayList<Integer> listTemperature = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_TEMP3);
+        ArrayList<Integer> listHumidity = (ArrayList<Integer>) sharedPreferences.getListInt(Utils.LIST_HUMID3);
+        if (listTemperature.size() > 0) {
             channel = 3;
-            displayData(listTemperature3, listHumidity3, lastUpdate3);
+            displayData(listTemperature, listHumidity, lastUpdate3);
         }
     }
 
@@ -283,6 +288,7 @@ public class MainActivity extends Activity implements OnClickListener {
             // Automatically connects to the device upon successful start-up
             // initialization.
             mBluetoothLeService.connect(mDeviceAddress);
+            myGattServices = new MyGattServices(MainActivity.this, mBluetoothLeService);
         }
 
         @Override
@@ -314,7 +320,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 // user interface.
                 mConnected = true;
                 Log.e("Discovered", "Discovered");
-                displayGattServices(mBluetoothLeService
+                myGattServices.displayGattServices(mBluetoothLeService
                         .getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 int indexArray = intent.getIntExtra(
@@ -326,8 +332,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 channel = intent.getIntExtra(BluetoothLeService.EXTRA_CHANNEL,
                         0);
                 int type = intent.getIntExtra(BluetoothLeService.EXTRA_TYPE, 0);
-                // Show dialog
-                showProgressDialog();
+                // Loading data
+                scanningTextView.setText("Loading data");
                 if (channel == 1) {
                     listTemperature1.add(temperature);
                     listHumidity1.add(humidity);
@@ -371,13 +377,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private void displayData(ArrayList<Integer> listTemperature,
                              ArrayList<Integer> listHumidity, long lastUpdate) {
-        // progressLayout.setVisibility(View.GONE);
-        mProgressDialog.dismiss();
         Log.e("display Data", "display Data");
-        currentTempTv.setText(listTemperature.get(listTemperature.size() - 1)
-                + " °C");
-        currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1)
-                + " %");
+        currentTempTv.setText(listTemperature.get(listTemperature.size() - 1) + " °C");
+        currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1) + " %");
         Log.e("size", listTemperature.size() + "");
         showLine(arrayButtonId[channel - 1]);
 
@@ -393,7 +395,8 @@ public class MainActivity extends Activity implements OnClickListener {
                     .format(new Date(lastUpdate)));
         }
         lastUpdatedTv.setVisibility(View.VISIBLE);
-        putDataToSharedPreference();
+        putDataToSharedPreference(listTemperature, listHumidity);
+        scanningTextView.setText("Scanning");
     }
 
     private void insertTemperatureDao(final ArrayList<Integer> listTemperature, final ArrayList<Integer> listHumidity, final int channel) {
@@ -418,8 +421,6 @@ public class MainActivity extends Activity implements OnClickListener {
                     // Check record is exist
                     Query query = lonoDao.queryBuilder().where(LonoDao.Properties.Channel.eq(channel),
                             LonoDao.Properties.TimeStamp.eq(calendar.getTimeInMillis())).build();
-//                            TemperatureDao.Properties.Value.eq(lono.getValue())).build();
-
                     if (query.list().size() == 0) {
                         lonoDao.insert(lono);
                     }
@@ -432,11 +433,21 @@ public class MainActivity extends Activity implements OnClickListener {
 
     /**
      * Push data to shared preference
+     *
+     * @param listTemperature
+     * @param listHumidity
      */
-    private void putDataToSharedPreference() {
-        sharedPreferences.putLong(Utils.LAST_UPDATED1, lastUpdate1);
-        sharedPreferences.putLong(Utils.LAST_UPDATED2, lastUpdate2);
-        sharedPreferences.putLong(Utils.LAST_UPDATED3, lastUpdate3);
+    private void putDataToSharedPreference(ArrayList<Integer> listTemperature, ArrayList<Integer> listHumidity) {
+        if (channel == 1) {
+            sharedPreferences.putList(Utils.LIST_TEMP1, listTemperature);
+            sharedPreferences.putList(Utils.LIST_HUMID1, listHumidity);
+        } else if (channel == 2) {
+            sharedPreferences.putList(Utils.LIST_TEMP2, listTemperature);
+            sharedPreferences.putList(Utils.LIST_HUMID2, listHumidity);
+        } else if (channel == 3) {
+            sharedPreferences.putList(Utils.LIST_TEMP3, listTemperature);
+            sharedPreferences.putList(Utils.LIST_HUMID3, listHumidity);
+        }
         sharedPreferences.putLong(Utils.CHANNEL, channel);
     }
 
@@ -460,58 +471,10 @@ public class MainActivity extends Activity implements OnClickListener {
         if (mBluetoothLeService != null) {
             mBluetoothLeService = null;
         }
-//        sharedPreferences.clear();
+        sharedPreferences.clear();
         stopRepeatingScan();
     }
 
-    private void displayGattServices(List<BluetoothGattService> gattServices) {
-        if (gattServices == null)
-            return;
-        String uuid = null;
-        String unknownServiceString = getResources().getString(
-                R.string.unknown_service);
-        String unknownCharaString = getResources().getString(
-                R.string.unknown_characteristic);
-        ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<HashMap<String, String>>();
-        ArrayList<ArrayList<HashMap<String, String>>> gattCharacteristicData = new ArrayList<ArrayList<HashMap<String, String>>>();
-        mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-
-        // Loops through available GATT Services.
-        for (BluetoothGattService gattService : gattServices) {
-            HashMap<String, String> currentServiceData = new HashMap<String, String>();
-            uuid = gattService.getUuid().toString();
-            currentServiceData.put(LIST_NAME,
-                    SampleGattAttributes.lookup(uuid, unknownServiceString));
-            currentServiceData.put(LIST_UUID, uuid);
-            gattServiceData.add(currentServiceData);
-
-            ArrayList<HashMap<String, String>> gattCharacteristicGroupData = new ArrayList<HashMap<String, String>>();
-            List<BluetoothGattCharacteristic> gattCharacteristics = gattService
-                    .getCharacteristics();
-            ArrayList<BluetoothGattCharacteristic> charas = new ArrayList<BluetoothGattCharacteristic>();
-
-            // Loops through available Characteristics.
-            for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                charas.add(gattCharacteristic);
-                HashMap<String, String> currentCharaData = new HashMap<String, String>();
-                uuid = gattCharacteristic.getUuid().toString();
-                currentCharaData.put(LIST_NAME,
-                        SampleGattAttributes.lookup(uuid, unknownCharaString));
-                currentCharaData.put(LIST_UUID, uuid);
-                gattCharacteristicGroupData.add(currentCharaData);
-                // Notify data to screen
-                if (gattCharacteristic
-                        .getUuid()
-                        .equals(BluetoothLeService.TEMPERATURE_MEASUREMENT_CHARACTERISTIC)) {
-                    mBluetoothLeService.readCharacteristic(gattCharacteristic);
-                    mBluetoothLeService.setCharacteristicNotification(
-                            gattCharacteristic, true);
-                }
-            }
-            mGattCharacteristics.add(charas);
-            gattCharacteristicData.add(gattCharacteristicGroupData);
-        }
-    }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -564,7 +527,6 @@ public class MainActivity extends Activity implements OnClickListener {
                              byte[] scanRecord) {
             if (device != null && !listDevice.contains(device.getAddress())
                     && device.getName().equals("NGE76")) {
-//            if (device.getName().equals("NGE76")) {
                 Log.e("device", device.getAddress());
                 listDevice.add(device.getAddress());
                 mDeviceAddress = device.getAddress();
@@ -572,24 +534,10 @@ public class MainActivity extends Activity implements OnClickListener {
                         BluetoothLeService.class);
                 bindService(gattServiceIntent, mServiceConnection,
                         BIND_AUTO_CREATE);
-                // if (device.getAddress().equals(listDevice.get(0))) {
-                // connectDevice(0);
-                // }
             }
         }
     };
 
-    public void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this,
-                    AlertDialog.THEME_HOLO_LIGHT);
-        }
-        if (!mProgressDialog.isShowing()) {
-            mProgressDialog.setMessage("Loading data...");
-            mProgressDialog.setCancelable(true);
-            mProgressDialog.show();
-        }
-    }
 
     private void setHumidityRange(int value) {
         if (value >= 0 && value <= 25) {
@@ -613,14 +561,6 @@ public class MainActivity extends Activity implements OnClickListener {
         public void run() {
             listDevice = new ArrayList<String>();
             mDeviceNumber = 0;
-            if (listTemperature1.size() > 3000) {
-                listTemperature1 = new ArrayList<Integer>();
-                listHumidity1 = new ArrayList<Integer>();
-                listTemperature2 = new ArrayList<Integer>();
-                listHumidity2 = new ArrayList<Integer>();
-                listTemperature3 = new ArrayList<Integer>();
-                listHumidity3 = new ArrayList<Integer>();
-            }
             Log.e("Repeat", "Repeat");
             scanLeDevice(true);
             repeatHandler.postDelayed(mScanRequest, mInterval);

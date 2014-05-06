@@ -19,6 +19,7 @@ import com.teusoft.lono.dao.MyDatabaseHelper;
 import com.teusoft.lono.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,8 +40,8 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
     private LonoDao lonoDao;
     private List<Lono> lonoList;
 
-    private ViewPager mPager;
-    private DayGraphPagerAdapter mPagerAdapter;
+    public ViewPager mPager;
+    public DayGraphPagerAdapter mPagerAdapter;
     public int pageNumber;// Number of page adapter
     private boolean isDaySelected;// Select day graph
     RelativeLayout mainLayout;
@@ -94,8 +95,13 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
             // Get number of page
             long roundStartDate = Utils.getRoundDay(lonoList.get(lonoList.size() - 1).getTimeStamp());
             // Page number is endtime - starttime/ oneday
-            pageNumber = (int) ((Utils.getRoundDay(lonoList.get(0).getTimeStamp()) - roundStartDate) / Utils.ONE_WEEK);
-            WeekGraphPagerAdapter mPagerAdapter = new WeekGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(lonoList.get(0).getTimeStamp());
+            int endWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+            calendar.setTimeInMillis(roundStartDate);
+            pageNumber = endWeek - calendar.get(Calendar.WEEK_OF_YEAR);
+            WeekGraphPagerAdapter
+                    mPagerAdapter = new WeekGraphPagerAdapter(getSupportFragmentManager(), channel, pageNumber + 1, roundStartDate);
             mPager.setAdapter(mPagerAdapter);
             mPager.setCurrentItem(pageNumber);
         } else {

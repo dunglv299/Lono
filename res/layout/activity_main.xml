@@ -11,6 +11,14 @@
             android:layout_weight="12"
             android:background="@color/white">
 
+        <Switch
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:textOff="°C"
+                android:textOn="°F"/>
+
         <ImageView
                 android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
@@ -67,6 +75,7 @@
                     android:layout_centerInParent="true"/>
 
             <TextView
+                    android:id="@+id/scanning_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/progress_bar"

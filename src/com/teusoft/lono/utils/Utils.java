@@ -37,4 +37,13 @@ public class Utils {
         c.set(Calendar.MINUTE, 0);
         return c.getTimeInMillis();
     }
+
+    public static long getRoundWeek(long timeStamp) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timeStamp);
+        c.set(Calendar.DAY_OF_WEEK, 1);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        return c.getTimeInMillis();
+    }
 }

@@ -5,9 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -158,6 +156,11 @@ public class Sharing {
             }
             // draw the view on the canvas
             view.draw(canvas);
+
+            canvas.drawBitmap(returnedBitmap, new Matrix(), null);
+            Bitmap overlayBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.lono_300);
+
+            canvas.drawBitmap(overlayBitmap, new Matrix(), null);
             // return the bitmap
             return returnedBitmap;
         }

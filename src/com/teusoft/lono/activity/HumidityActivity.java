@@ -3,8 +3,9 @@ package com.teusoft.lono.activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.TextView;
 import com.teusoft.lono.R;
+import com.teusoft.lono.adapter.DayGraphPagerAdapter;
 import com.teusoft.lono.dao.Lono;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class HumidityActivity extends TemperatureActivity implements
     @Override
     public void initView() {
         super.initView();
-        ((Button) findViewById(R.id.tv_temperature)).setText(R.string.humidity);
+        ((TextView) findViewById(R.id.tv_temperature)).setText(R.string.humidity);
         findViewById(R.id.dewpoint_layout).setVisibility(View.GONE);
     }
 
@@ -48,5 +49,7 @@ public class HumidityActivity extends TemperatureActivity implements
         maxTv.setText("-- %");
         averageTv.setText("-- %");
         dewPointTv.setText("-- %");
+        mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), 0, 0, 0);
+        mPager.setAdapter(mPagerAdapter);
     }
 }

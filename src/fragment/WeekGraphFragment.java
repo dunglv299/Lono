@@ -44,7 +44,8 @@ public class WeekGraphFragment extends Fragment {
     private List<Lono> lonoList;
     private int maxValue, minValue;
     private long roundStartDate;
-    private long roundEndDate;
+    private long roundStartWeek;
+    private long roundEndWeek;
 
     public static WeekGraphFragment create(int pageNumber, int channel, long roundStartDate) {
         WeekGraphFragment fragment = new WeekGraphFragment();
@@ -63,7 +64,8 @@ public class WeekGraphFragment extends Fragment {
         mPageNumber = getArguments().getInt(ARG_PAGE);
         channel = getArguments().getInt(CHANNEL);
         roundStartDate = getArguments().getLong(ROUND_STARTDATE) + mPageNumber * Utils.ONE_WEEK;
-        roundEndDate = roundStartDate + (mPageNumber + 1) * Utils.ONE_WEEK;
+        roundStartWeek = Utils.getRoundWeek(roundStartDate);
+        roundEndWeek = roundStartWeek + (mPageNumber + 1) * Utils.ONE_WEEK;
     }
 
     @Override
@@ -79,7 +81,7 @@ public class WeekGraphFragment extends Fragment {
         // load data from database
         lonoDao = MyDatabaseHelper.getInstance(getActivity()).getmSession().getLonoDao();
         lonoList = lonoDao.queryBuilder()
-                .where(LonoDao.Properties.Channel.eq(channel), LonoDao.Properties.TimeStamp.between(roundStartDate, roundEndDate - 1))
+                .where(LonoDao.Properties.Channel.eq(channel), LonoDao.Properties.TimeStamp.between(roundStartWeek, roundEndWeek - 1))
                 .orderAsc(LonoDao.Properties.TimeStamp)
                 .list();
         drawGraph(lonoList);
@@ -171,6 +173,5 @@ public class WeekGraphFragment extends Fragment {
         labelX[5] = "FRI";
         labelX[6] = "SAT";
         labelX[7] = "";
-
     }
 }
