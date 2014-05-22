@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="greendao-1.3.7">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../greendao-1.3.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../_Library/greendao-1.3.7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

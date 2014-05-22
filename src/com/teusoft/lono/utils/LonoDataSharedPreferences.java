@@ -83,7 +83,6 @@ public class LonoDataSharedPreferences {
 			prefsEditor.putString(key, ObjectSerializer.serialize(listData));
 			prefsEditor.commit();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -100,7 +99,6 @@ public class LonoDataSharedPreferences {
 							.serialize(new ArrayList<Integer>())));
 			return list;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

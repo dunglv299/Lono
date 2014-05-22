@@ -23,6 +23,7 @@ import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
 import com.teusoft.lono.service.BluetoothLeService;
+import com.teusoft.lono.utils.LogUtils;
 import com.teusoft.lono.utils.LonoDataSharedPreferences;
 import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
@@ -69,7 +70,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private Handler repeatHandler;
     private int mDeviceNumber;
     private LonoDao lonoDao;
-    private TextView exportBtn, scanningTextView;
+    private TextView scanningTextView;
     private MyGattServices myGattServices;
     private ToggleButton mDegreeToggle;
     private boolean isDegreeF;
@@ -136,8 +137,7 @@ public class MainActivity extends Activity implements OnClickListener {
         progressLayout.setVisibility(View.VISIBLE);
         // showLine(R.id.btn1);
         // init export btn
-        exportBtn = (TextView) findViewById(R.id.exportBtn);
-        exportBtn.setOnClickListener(this);
+        findViewById(R.id.exportBtn).setOnClickListener(this);
         mDegreeToggle = (ToggleButton) findViewById(R.id.degree_toggle);
         mDegreeToggle.setOnClickListener(this);
     }
@@ -287,11 +287,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
-            Log.e("onServiceConnected", "onServiceConnected");
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service)
                     .getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up
@@ -311,11 +309,9 @@ public class MainActivity extends Activity implements OnClickListener {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                Log.e("Connected", "Connected");
                 invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
                     .equals(action)) {
-                Log.e("Disconnected", "Disconnected");
                 mConnected = false;
                 invalidateOptionsMenu();
                 mDeviceNumber++;
@@ -328,7 +324,6 @@ public class MainActivity extends Activity implements OnClickListener {
                 // Show all the supported services and characteristics on the
                 // user interface.
                 mConnected = true;
-                Log.e("Discovered", "Discovered");
                 myGattServices.displayGattServices(mBluetoothLeService
                         .getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
@@ -377,7 +372,6 @@ public class MainActivity extends Activity implements OnClickListener {
     };
 
     private void connectDevice(int index) {
-        Log.e("connectDevice", (index + 1) + "");
         mDeviceAddress = listDevice.get(index);
         Intent gattServiceIntent = new Intent(MainActivity.this,
                 BluetoothLeService.class);
@@ -386,7 +380,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private void displayData(ArrayList<Integer> listTemperature,
                              ArrayList<Integer> listHumidity, long lastUpdate) {
-        Log.e("display Data", "display Data");
         int currentTemp = listTemperature.get(listTemperature.size() - 1);
         if (isDegreeF) {
             currentTempTv.setText(Utils.getFValue(currentTemp) + " °F");
@@ -401,7 +394,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
         }
         currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1) + " %");
-        Log.e("size", listTemperature.size() + "");
         showLine(arrayButtonId[channel - 1]);
 
         minHumidityTv.setText(Collections.min(listHumidity) + " %");
@@ -545,7 +537,7 @@ public class MainActivity extends Activity implements OnClickListener {
                              byte[] scanRecord) {
             if (device != null && !listDevice.contains(device.getAddress())
                     && device.getName().equals("NGE76")) {
-                Log.e("device", device.getAddress());
+                LogUtils.e("device: " + device.getAddress());
                 listDevice.add(device.getAddress());
                 mDeviceAddress = device.getAddress();
                 Intent gattServiceIntent = new Intent(MainActivity.this,
@@ -579,7 +571,7 @@ public class MainActivity extends Activity implements OnClickListener {
         public void run() {
             listDevice = new ArrayList<String>();
             mDeviceNumber = 0;
-            Log.e("Repeat", "Repeat");
+            LogUtils.e("Repeat");
             scanLeDevice(true);
             repeatHandler.postDelayed(mScanRequest, mInterval);
         }

@@ -65,7 +65,7 @@ public class WeekGraphFragment extends Fragment {
         channel = getArguments().getInt(CHANNEL);
         roundStartDate = getArguments().getLong(ROUND_STARTDATE) + mPageNumber * Utils.ONE_WEEK;
         roundStartWeek = Utils.getRoundWeek(roundStartDate);
-        roundEndWeek = roundStartWeek + (mPageNumber + 1) * Utils.ONE_WEEK;
+        roundEndWeek = roundStartWeek + Utils.ONE_WEEK;
         isDegreeF = getArguments().getBoolean(Utils.DEGREE_TYPE);
     }
 
