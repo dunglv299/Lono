@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -102,9 +101,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
             // Start scan
-            startRepeatingScan();
+//            startRepeatingScan();
         }
-
     }
 
     private void initView() {
@@ -160,19 +158,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         switch (v.getId()) {
             case R.id.btn1:
                 channel = 1;
-                connectDevice(address1);
+//                connectDevice(address1);
                 goToChannel(channel - 1);
                 showLine(arrayButtonId[0]);
                 break;
             case R.id.btn2:
                 channel = 2;
-                connectDevice(address2);
+                listDevice.clear();
+                scanLeDevice(true);
+//                connectDevice(address2);
                 goToChannel(channel - 1);
                 showLine(arrayButtonId[1]);
                 break;
             case R.id.btn3:
                 channel = 3;
-                connectDevice(address3);
+                listDevice.clear();
+                scanLeDevice(true);
+//                connectDevice(address3);
                 goToChannel(channel - 1);
                 showLine(arrayButtonId[2]);
                 break;
@@ -228,7 +230,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             }
             // Automatically connects to the device upon successful start-up
             // initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            mBluetoothLeService.connect(mDeviceAddress, channel);
             myGattServices = new MyGattServices(MainActivity.this, mBluetoothLeService);
         }
 
@@ -277,17 +279,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 listHumidity.add(humidity);
                 if (type == 0 && indexArray == 1) {
                     // Get address
-                    if (channel == 1) {
-                        address1 = mBluetoothLeService.getmBluetoothDeviceAddress();
-                    } else if (channel == 2) {
-                        address2 = mBluetoothLeService.getmBluetoothDeviceAddress();
-                    } else if (channel == 3) {
-                        address3 = mBluetoothLeService.getmBluetoothDeviceAddress();
-                    }
+//                    if (channel == 1) {
+//                        address1 = mBluetoothLeService.getmBluetoothDeviceAddress();
+//                    } else if (channel == 2) {
+//                        address2 = mBluetoothLeService.getmBluetoothDeviceAddress();
+//                    } else if (channel == 3) {
+//                        address3 = mBluetoothLeService.getmBluetoothDeviceAddress();
+//                    }
                     lastUpdate = System.currentTimeMillis();
                     displayData(listTemperature, listHumidity,
                             lastUpdate);
                     insertDao(listTemperature, listHumidity, channel);
+                    scanLeDevice(false);
+                    unbindService(mServiceConnection);
                 }
             }
         }
@@ -300,19 +304,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
-    private void connectDevice(String deviceAddress) {
-        if (TextUtils.isEmpty(deviceAddress)) {
-            return;
-        }
-        progressLayout.setVisibility(View.VISIBLE);
-        scanningTextView.setText("Connecting");
-        Toast.makeText(this, "Connect device " + deviceAddress, Toast.LENGTH_LONG).show();
-        mDeviceAddress = deviceAddress;
-
-        Intent gattServiceIntent = new Intent(MainActivity.this,
-                BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-    }
+//    private void connectDevice(String deviceAddress) {
+//        if (TextUtils.isEmpty(deviceAddress)) {
+//            return;
+//        }
+//        progressLayout.setVisibility(View.VISIBLE);
+//        scanningTextView.setText("Connecting");
+//        Toast.makeText(this, "Connect device " + deviceAddress, Toast.LENGTH_LONG).show();
+//        mDeviceAddress = deviceAddress;
+//
+//        Intent gattServiceIntent = new Intent(MainActivity.this,
+//                BluetoothLeService.class);
+//        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+//    }
 
     private void displayData(ArrayList<Integer> listTemperature,
                              ArrayList<Integer> listHumidity, long lastUpdate) {
@@ -409,19 +413,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
-            scanHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.e("Stop", "Stop");
-                    progressLayout.setVisibility(View.GONE);
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    invalidateOptionsMenu();
-                }
-            }, SCAN_PERIOD);
+            scanHandler.postDelayed(stopScanRunnable, SCAN_PERIOD);
             mBluetoothAdapter.startLeScan(mLeScanCallback);
             progressLayout.setVisibility(View.VISIBLE);
         } else {
+            scanHandler.removeCallbacks(stopScanRunnable);
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            progressLayout.setVisibility(View.INVISIBLE);
         }
         invalidateOptionsMenu();
     }
@@ -459,7 +457,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
 
     // Create repeat scan
-    Runnable mScanRequest = new Runnable() {
+    private Runnable mScanRequest = new Runnable() {
         @Override
         public void run() {
             listDevice = new ArrayList<String>();
@@ -467,6 +465,16 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             LogUtils.e("Repeat");
             scanLeDevice(true);
             repeatHandler.postDelayed(mScanRequest, mInterval);
+        }
+    };
+    // Stop scan runnable
+    private Runnable stopScanRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Log.e("Stop", "Stop");
+            progressLayout.setVisibility(View.GONE);
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            invalidateOptionsMenu();
         }
     };
 
