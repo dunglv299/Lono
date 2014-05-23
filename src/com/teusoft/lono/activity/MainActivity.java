@@ -276,12 +276,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 listTemperature.add(temperature);
                 listHumidity.add(humidity);
                 if (type == 0 && indexArray == 1) {
+                    // Get address
                     if (channel == 1) {
-                        address1 = mDeviceAddress;
+                        address1 = mBluetoothLeService.getmBluetoothDeviceAddress();
                     } else if (channel == 2) {
-                        address2 = mDeviceAddress;
+                        address2 = mBluetoothLeService.getmBluetoothDeviceAddress();
                     } else if (channel == 3) {
-                        address3 = mDeviceAddress;
+                        address3 = mBluetoothLeService.getmBluetoothDeviceAddress();
                     }
                     lastUpdate = System.currentTimeMillis();
                     displayData(listTemperature, listHumidity,
@@ -305,8 +306,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         }
         progressLayout.setVisibility(View.VISIBLE);
         scanningTextView.setText("Connecting");
-        LogUtils.e("Connect device " + deviceAddress);
+        Toast.makeText(this, "Connect device " + deviceAddress, Toast.LENGTH_LONG).show();
         mDeviceAddress = deviceAddress;
+
         Intent gattServiceIntent = new Intent(MainActivity.this,
                 BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
