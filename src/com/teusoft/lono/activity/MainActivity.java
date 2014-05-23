@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -66,6 +67,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private MyGattServices myGattServices;
     private ToggleButton mDegreeToggle;
     private boolean isDegreeF;
+    private String address1, address2, address3;
 
     private ViewPager mPager;
     private MainViewPagerAdapter mainViewPagerAdapter;
@@ -158,16 +160,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         switch (v.getId()) {
             case R.id.btn1:
                 channel = 1;
+                connectDevice(address1);
                 goToChannel(channel - 1);
                 showLine(arrayButtonId[0]);
                 break;
             case R.id.btn2:
                 channel = 2;
+                connectDevice(address2);
                 goToChannel(channel - 1);
                 showLine(arrayButtonId[1]);
                 break;
             case R.id.btn3:
                 channel = 3;
+                connectDevice(address3);
                 goToChannel(channel - 1);
                 showLine(arrayButtonId[2]);
                 break;
@@ -241,6 +246,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED
                     .equals(action)) {
+                LogUtils.e("Disconnect");
                 mConnected = false;
                 invalidateOptionsMenu();
                 mDeviceNumber++;
@@ -270,6 +276,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 listTemperature.add(temperature);
                 listHumidity.add(humidity);
                 if (type == 0 && indexArray == 1) {
+                    if (channel == 1) {
+                        address1 = mDeviceAddress;
+                    } else if (channel == 2) {
+                        address2 = mDeviceAddress;
+                    } else if (channel == 3) {
+                        address3 = mDeviceAddress;
+                    }
                     lastUpdate = System.currentTimeMillis();
                     displayData(listTemperature, listHumidity,
                             lastUpdate);
@@ -281,6 +294,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     private void connectDevice(int index) {
         mDeviceAddress = listDevice.get(index);
+        Intent gattServiceIntent = new Intent(MainActivity.this,
+                BluetoothLeService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private void connectDevice(String deviceAddress) {
+        if (TextUtils.isEmpty(deviceAddress)) {
+            return;
+        }
+        progressLayout.setVisibility(View.VISIBLE);
+        scanningTextView.setText("Connecting");
+        LogUtils.e("Connect device " + deviceAddress);
+        mDeviceAddress = deviceAddress;
         Intent gattServiceIntent = new Intent(MainActivity.this,
                 BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
