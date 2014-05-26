@@ -128,6 +128,7 @@ public class BluetoothLeService extends Service {
             int type = characteristic.getIntValue(
                     BluetoothGattCharacteristic.FORMAT_UINT8, 0).intValue();
             if (this.channel != channel) {
+                disconnect();
                 return;
             }
             // Log.e("temperature", temperature + "");

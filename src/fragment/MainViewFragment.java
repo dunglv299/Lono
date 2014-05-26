@@ -27,6 +27,7 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
     private MainActivity activity;
     private ArrayList<Integer> listTemperature;
     private ArrayList<Integer> listHumidity;
+    public TextView reconnectBtn;
 
     @Override
     protected void init(View view) {
@@ -50,6 +51,10 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
         Utils.changeTextDegreeType(currentTempTv, activity.isDegreeF());
         Utils.changeTextDegreeType(minTempTv, activity.isDegreeF());
         Utils.changeTextDegreeType(maxTempTv, activity.isDegreeF());
+
+        // Init Reconnect button
+        reconnectBtn = (TextView) view.findViewById(R.id.reconnect_btn);
+        reconnectBtn.setOnClickListener(this);
     }
 
     public static MainViewFragment newInstance() {
@@ -70,6 +75,9 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
                 break;
             case R.id.humidity_layout:
                 goToHumidityActivity();
+                break;
+            case R.id.reconnect_btn:
+                activity.reconnect();
                 break;
         }
     }
@@ -107,6 +115,7 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
                     .format(new Date(lastUpdate)));
         }
         lastUpdatedTv.setVisibility(View.VISIBLE);
+        reconnectBtn.setVisibility(View.VISIBLE);
     }
 
     private void setHumidityRange(int value) {

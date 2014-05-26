@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity implements OnClickListener {
+public class MainActivity extends FragmentActivity implements OnClickListener, ViewPager.OnPageChangeListener {
     private static final int mInterval = 5 * 60 * 1000;
     private static final long SCAN_PERIOD = 80000;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -66,7 +67,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private MyGattServices myGattServices;
     private ToggleButton mDegreeToggle;
     private boolean isDegreeF;
-    private String address1, address2, address3;
+    private String[] addressArray = new String[3];
 
     private ViewPager mPager;
     private MainViewPagerAdapter mainViewPagerAdapter;
@@ -101,7 +102,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
             // Start scan
-//            startRepeatingScan();
+            startRepeatingScan();
         }
     }
 
@@ -111,6 +112,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mPager.setOffscreenPageLimit(2);
         mainViewPagerAdapter = new MainViewPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mainViewPagerAdapter);
+        mPager.setOnPageChangeListener(this);
 
 
         setFont();
@@ -158,25 +160,15 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         switch (v.getId()) {
             case R.id.btn1:
                 channel = 1;
-//                connectDevice(address1);
-                goToChannel(channel - 1);
-                showLine(arrayButtonId[0]);
+                onChannelPress(channel);
                 break;
             case R.id.btn2:
                 channel = 2;
-                listDevice.clear();
-                scanLeDevice(true);
-//                connectDevice(address2);
-                goToChannel(channel - 1);
-                showLine(arrayButtonId[1]);
+                onChannelPress(channel);
                 break;
             case R.id.btn3:
                 channel = 3;
-                listDevice.clear();
-                scanLeDevice(true);
-//                connectDevice(address3);
-                goToChannel(channel - 1);
-                showLine(arrayButtonId[2]);
+                onChannelPress(channel);
                 break;
             case R.id.exportBtn:
                 new CSVExport(this, lonoDao, isDegreeF).export();
@@ -187,6 +179,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             default:
                 break;
         }
+    }
+
+    /**
+     * set view and scan when select channel
+     * @param channel
+     */
+    public void onChannelPress(int channel) {
+        listDevice.clear();
+        if (TextUtils.isEmpty(addressArray[channel - 1])) {
+            scanLeDevice(true);
+        }
+        goToChannel(channel - 1);
+        showLine(arrayButtonId[channel - 1]);
     }
 
     private void showLine(int id) {
@@ -279,13 +284,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 listHumidity.add(humidity);
                 if (type == 0 && indexArray == 1) {
                     // Get address
-//                    if (channel == 1) {
-//                        address1 = mBluetoothLeService.getmBluetoothDeviceAddress();
-//                    } else if (channel == 2) {
-//                        address2 = mBluetoothLeService.getmBluetoothDeviceAddress();
-//                    } else if (channel == 3) {
-//                        address3 = mBluetoothLeService.getmBluetoothDeviceAddress();
-//                    }
+                    addressArray[channel - 1] = mBluetoothLeService.getmBluetoothDeviceAddress();
                     lastUpdate = System.currentTimeMillis();
                     displayData(listTemperature, listHumidity,
                             lastUpdate);
@@ -304,19 +303,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
-//    private void connectDevice(String deviceAddress) {
-//        if (TextUtils.isEmpty(deviceAddress)) {
-//            return;
-//        }
-//        progressLayout.setVisibility(View.VISIBLE);
-//        scanningTextView.setText("Connecting");
-//        Toast.makeText(this, "Connect device " + deviceAddress, Toast.LENGTH_LONG).show();
-//        mDeviceAddress = deviceAddress;
-//
-//        Intent gattServiceIntent = new Intent(MainActivity.this,
-//                BluetoothLeService.class);
-//        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-//    }
+    public void reconnect() {
+        progressLayout.setVisibility(View.VISIBLE);
+        scanningTextView.setText("Reconnect...");
+        mDeviceAddress = addressArray[channel - 1];
+        Intent gattServiceIntent = new Intent(MainActivity.this,
+                BluetoothLeService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+    }
 
     private void displayData(ArrayList<Integer> listTemperature,
                              ArrayList<Integer> listHumidity, long lastUpdate) {
@@ -506,5 +500,21 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     public boolean isDegreeF() {
         return isDegreeF;
+    }
+
+    @Override
+    public void onPageScrolled(int i, float v, int i2) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        channel = position + 1;
+        showLine(arrayButtonId[position]);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
     }
 }
