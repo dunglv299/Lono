@@ -1,7 +1,6 @@
 package com.teusoft.lono.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -50,10 +49,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
     private BluetoothAdapter mBluetoothAdapter;
 
     private int[] arrayButtonId = {R.id.btn1, R.id.btn2, R.id.btn3};
-    private int[] arrayLineId = {R.id.line_btn1, R.id.line_btn2,
-            R.id.line_btn3};
+    //    private int[] arrayLineId = {R.id.line_btn1, R.id.line_btn2,
+//            R.id.line_btn3};
     private Button[] arrayButton = new Button[BUTTONS_SIZE];
-    private View[] arrayLine = new View[BUTTONS_SIZE];
+    //    private View[] arrayLine = new View[BUTTONS_SIZE];
     private ArrayList<Integer> listTemperature;
     private ArrayList<Integer> listHumidity;
     private int channel;
@@ -119,7 +118,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         setFont();
         for (int i = 0; i < arrayButton.length; i++) {
             arrayButton[i] = (Button) findViewById(arrayButtonId[i]);
-            arrayLine[i] = findViewById(arrayLineId[i]);
+//            arrayLine[i] = findViewById(arrayLineId[i]);
             arrayButton[i].setOnClickListener(this);
             arrayButton[i].setOnLongClickListener(this);
         }
@@ -144,15 +143,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         // Setting C/F degree
         isDegreeF = mySharedPreferences.getBoolean(Utils.DEGREE_TYPE);
         mDegreeToggle.setChecked(isDegreeF);
-        // Init channel name
-        for (int i = 0; i < BUTTONS_SIZE; i++) {
-            String channelName = mySharedPreferences.getString("channel_name_" + (i + 1));
-            if (!TextUtils.isEmpty(channelName)) {
-                arrayButton[i].setText(channelName);
-                arrayButton[i].setTextSize(getResources().getDimension(R.dimen.graph_font_size));
-            }
-        }
+
     }
+
 
     public void setFont() {
         Typeface tf = Utils.getTypeface(this);
@@ -163,6 +156,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         ((TextView) findViewById(R.id.btn2)).setTypeface(tf);
         ((TextView) findViewById(R.id.btn3)).setTypeface(tf);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Init channel name
+        for (int i = 0; i < BUTTONS_SIZE; i++) {
+            String channelName = mySharedPreferences.getString("channel_name_" + (i + 1));
+            if (!TextUtils.isEmpty(channelName)) {
+                arrayButton[i].setText(channelName);
+                arrayButton[i].setTextSize(getResources().getDimension(R.dimen.graph_font_size));
+            }
+        }
     }
 
     @Override
@@ -210,11 +216,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         int index = getIndex(id);
         for (int i = 0; i < arrayButtonId.length; i++) {
             if (i == index) {
-                arrayLine[i].setVisibility(View.VISIBLE);
+//                arrayLine[i].setVisibility(View.VISIBLE);
                 arrayButton[i].setBackgroundColor(getResources().getColor(
                         R.color.color_botton_enable));
             } else {
-                arrayLine[i].setVisibility(View.GONE);
+//                arrayLine[i].setVisibility(View.GONE);
                 arrayButton[i].setBackgroundColor(getResources().getColor(
                         R.color.color_botton_disable));
             }
@@ -538,44 +544,17 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
     public boolean onLongClick(View view) {
         switch (view.getId()) {
             case R.id.btn1:
-                showEditChannelDialog(1);
+                TemperatureActivity.showEditChannelDialog(this, arrayButton, mySharedPreferences, 1);
                 break;
             case R.id.btn2:
-                showEditChannelDialog(2);
+                TemperatureActivity.showEditChannelDialog(this, arrayButton, mySharedPreferences, 2);
                 break;
             case R.id.btn3:
-                showEditChannelDialog(3);
+                TemperatureActivity.showEditChannelDialog(this, arrayButton, mySharedPreferences, 3);
                 break;
         }
         return true;
     }
 
-    public void showEditChannelDialog(final int channelNumber) {
-        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Rename channel " + channelNumber);
-        // Set an EditText view to get user input
-        final EditText editText = new EditText(this);
-        editText.setHint("Input new channel name");
-        alert.setView(editText);
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String value = editText.getText().toString().trim();
-                if (TextUtils.isEmpty(value)) {
-                    Utils.showAlert(MainActivity.this, "Your channel name is blank. Please try again!");
-                    return;
-                }
-                arrayButton[channelNumber - 1].setText(value);
-                arrayButton[channelNumber - 1].setTextSize(getResources().getDimension(R.dimen.graph_font_size));
-                mySharedPreferences.putString("channel_name_" + channelNumber, value);
-            }
-        });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-            }
-        });
-
-        alert.show();
-    }
 }

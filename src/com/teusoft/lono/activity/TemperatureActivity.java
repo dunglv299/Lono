@@ -1,12 +1,17 @@
 package com.teusoft.lono.activity;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.teusoft.lono.R;
@@ -24,15 +29,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
-public class TemperatureActivity extends FragmentActivity implements OnClickListener {
+public class TemperatureActivity extends FragmentActivity implements OnClickListener, View.OnLongClickListener {
     Button homeBtn;
     TextView nowTv, minTv, maxTv, averageTv, dewPointTv;
     private int[] arrayButtonId = {R.id.btn1, R.id.btn2, R.id.btn3};
     private Button[] arrayButton = new Button[BUTTONS_SIZE];
     private static final int BUTTONS_SIZE = 3;
-    private View[] arrayLine = new View[BUTTONS_SIZE];
-    private int[] arrayLineId = {R.id.line_btn1, R.id.line_btn2,
-            R.id.line_btn3};
+//    private View[] arrayLine = new View[BUTTONS_SIZE];
+//    private int[] arrayLineId = {R.id.line_btn1, R.id.line_btn2,
+//            R.id.line_btn3};
 
     public List<Integer> listHumidity;
     public int maxValue, minValue;
@@ -53,9 +58,9 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
+        mySharedPreferences = new MySharedPreferences(this);
         initView();
         channel = getIntent().getExtras().getInt(Utils.CHANNEL);
-        mySharedPreferences = new MySharedPreferences(this);
         isDegreeF = mySharedPreferences.getBoolean(Utils.DEGREE_TYPE);
         // load list data form database
         lonoDao = MyDatabaseHelper.getInstance(this).getmSession().getLonoDao();
@@ -125,8 +130,9 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
         dewPointTv = (TextView) findViewById(R.id.tv_dewpoint_value);
         for (int i = 0; i < arrayButton.length; i++) {
             arrayButton[i] = (Button) findViewById(arrayButtonId[i]);
-            arrayLine[i] = findViewById(arrayLineId[i]);
+//            arrayLine[i] = findViewById(arrayLineId[i]);
             arrayButton[i].setOnClickListener(this);
+            arrayButton[i].setOnLongClickListener(this);
         }
         findViewById(R.id.dayBtn).setOnClickListener(this);
         findViewById(R.id.dayBtn).setBackgroundColor(getResources().getColor(R.color.green_text_color));
@@ -135,6 +141,14 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
         // Share btn
         findViewById(R.id.share_btn).setOnClickListener(this);
         mainLayout = (RelativeLayout) findViewById(R.id.main_layout);
+        // Init channel name
+        for (int i = 0; i < BUTTONS_SIZE; i++) {
+            String channelName = mySharedPreferences.getString("channel_name_" + (i + 1));
+            if (!TextUtils.isEmpty(channelName)) {
+                arrayButton[i].setText(channelName);
+                arrayButton[i].setTextSize(getResources().getDimension(R.dimen.graph_font_size));
+            }
+        }
     }
 
 
@@ -292,14 +306,62 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
     private void showLine(int index) {
         for (int i = 0; i < arrayButtonId.length; i++) {
             if (i == index) {
-                arrayLine[i].setVisibility(View.VISIBLE);
+//                arrayLine[i].setVisibility(View.VISIBLE);
                 arrayButton[i].setBackgroundColor(getResources().getColor(
                         R.color.color_botton_enable));
             } else {
-                arrayLine[i].setVisibility(View.GONE);
+//                arrayLine[i].setVisibility(View.GONE);
                 arrayButton[i].setBackgroundColor(getResources().getColor(
                         R.color.color_botton_disable));
             }
         }
     }
+
+    @Override
+    public boolean onLongClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn1:
+                showEditChannelDialog(this, arrayButton, mySharedPreferences, 1);
+                break;
+            case R.id.btn2:
+                showEditChannelDialog(this, arrayButton, mySharedPreferences, 2);
+                break;
+            case R.id.btn3:
+                showEditChannelDialog(this, arrayButton, mySharedPreferences, 3);
+                break;
+        }
+        return true;
+    }
+
+    public static void showEditChannelDialog(final Context context, final Button[] arrayButton,
+                                             final MySharedPreferences mySharedPreferences, final int channelNumber) {
+        final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle("Rename channel " + channelNumber);
+        // Set an EditText view to get user input
+        final EditText editText = new EditText(context);
+        editText.setHint("Input new channel name");
+        alert.setView(editText);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = channelNumber + "\n" + editText.getText().toString().trim();
+                if (TextUtils.isEmpty(value)) {
+                    Utils.showAlert(context, "Your channel name is blank. Please try again!");
+                    return;
+                }
+                arrayButton[channelNumber - 1].setText(value);
+                arrayButton[channelNumber - 1].setTextSize(context.getResources().getDimension(R.dimen.graph_font_size));
+                mySharedPreferences.putString("channel_name_" + channelNumber, value);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+
 }

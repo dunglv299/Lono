@@ -152,6 +152,8 @@ public class WeekGraphFragment extends Fragment {
                 getResources().getDimension(R.dimen.graph_font_size));
         graphView.getGraphViewStyle().setNumVerticalLabels(5);
         graphView.getGraphViewStyle().setNumHorizontalLabels(8);
+        graphView.getGraphViewStyle().setVerticalLabelsColor(Color.WHITE);
+        graphView.getGraphViewStyle().setHorizontalLabelsColor(Color.WHITE);
         graphView.setViewPort(0, 288 * 7);
         setLabelX();
         graphView.setHorizontalLabels(labelX);

@@ -40,13 +40,13 @@
         <activity
                 android:name="com.teusoft.lono.activity.TemperatureActivity"
                 android:screenOrientation="portrait"
-                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+                android:theme="@style/Theme.Transparent">
         </activity>
 
         <activity
                 android:name="com.teusoft.lono.activity.HumidityActivity"
                 android:screenOrientation="portrait"
-                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+                android:theme="@style/Theme.Transparent">
         </activity>
 
         <service
