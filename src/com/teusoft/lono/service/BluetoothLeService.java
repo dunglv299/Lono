@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import com.teusoft.lono.utils.MySharedPreferences;
+import com.teusoft.lono.utils.Utils;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +42,7 @@ public class BluetoothLeService extends Service {
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
     private int channel;
+    private MySharedPreferences sharedPreferences;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -112,6 +115,12 @@ public class BluetoothLeService extends Service {
         sendBroadcast(intent);
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        sharedPreferences = new MySharedPreferences(getApplicationContext());
+    }
+
     private void broadcastUpdate(final String action,
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
@@ -127,7 +136,8 @@ public class BluetoothLeService extends Service {
                     BluetoothGattCharacteristic.FORMAT_UINT8, 2).intValue();
             int type = characteristic.getIntValue(
                     BluetoothGattCharacteristic.FORMAT_UINT8, 0).intValue();
-            if (this.channel != channel) {
+            if (this.channel != channel && !sharedPreferences.getBoolean(Utils.AUTO_CONNECT)) {
+                Log.e("Disconnect","Disconnect");
                 disconnect();
                 return;
             }

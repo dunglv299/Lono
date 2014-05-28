@@ -1,6 +1,7 @@
 package com.teusoft.lono.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -36,9 +37,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity implements OnClickListener, ViewPager.OnPageChangeListener {
+public class MainActivity extends FragmentActivity implements OnClickListener, ViewPager.OnPageChangeListener, View.OnLongClickListener {
     private static final int mInterval = 5 * 60 * 1000;
-    private static final long SCAN_PERIOD = 80000;
+    private static final long SCAN_PERIOD = 100000;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int BUTTONS_SIZE = 3;
 
@@ -120,6 +121,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
             arrayButton[i] = (Button) findViewById(arrayButtonId[i]);
             arrayLine[i] = findViewById(arrayLineId[i]);
             arrayButton[i].setOnClickListener(this);
+            arrayButton[i].setOnLongClickListener(this);
         }
 
         progressLayout = (RelativeLayout) findViewById(R.id.progress_layout);
@@ -142,6 +144,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         // Setting C/F degree
         isDegreeF = mySharedPreferences.getBoolean(Utils.DEGREE_TYPE);
         mDegreeToggle.setChecked(isDegreeF);
+        // Init channel name
+        for (int i = 0; i < BUTTONS_SIZE; i++) {
+            String channelName = mySharedPreferences.getString("channel_name_" + (i + 1));
+            if (!TextUtils.isEmpty(channelName)) {
+                arrayButton[i].setText(channelName);
+                arrayButton[i].setTextSize(getResources().getDimension(R.dimen.graph_font_size));
+            }
+        }
     }
 
     public void setFont() {
@@ -183,6 +193,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
 
     /**
      * set view and scan when select channel
+     *
      * @param channel
      */
     public void onChannelPress(int channel) {
@@ -192,6 +203,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         }
         goToChannel(channel - 1);
         showLine(arrayButtonId[channel - 1]);
+        mySharedPreferences.putBoolean(Utils.AUTO_CONNECT, false);
     }
 
     private void showLine(int id) {
@@ -268,6 +280,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
                 mConnected = true;
                 myGattServices.displayGattServices(mBluetoothLeService
                         .getSupportedGattServices());
+                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 int indexArray = intent.getIntExtra(
                         BluetoothLeService.EXTRA_COUNT, 0);
@@ -289,8 +302,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
                     displayData(listTemperature, listHumidity,
                             lastUpdate);
                     insertDao(listTemperature, listHumidity, channel);
-                    scanLeDevice(false);
-                    unbindService(mServiceConnection);
+                    if (!mySharedPreferences.getBoolean(Utils.AUTO_CONNECT)) {
+                        scanLeDevice(false);
+                        unbindService(mServiceConnection);
+                    }
                 }
             }
         }
@@ -473,6 +488,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
     };
 
     private void startRepeatingScan() {
+        mySharedPreferences.putBoolean(Utils.AUTO_CONNECT, true);
         mScanRequest.run();
     }
 
@@ -516,5 +532,50 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
     @Override
     public void onPageScrollStateChanged(int i) {
 
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn1:
+                showEditChannelDialog(1);
+                break;
+            case R.id.btn2:
+                showEditChannelDialog(2);
+                break;
+            case R.id.btn3:
+                showEditChannelDialog(3);
+                break;
+        }
+        return true;
+    }
+
+    public void showEditChannelDialog(final int channelNumber) {
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Rename channel " + channelNumber);
+        // Set an EditText view to get user input
+        final EditText editText = new EditText(this);
+        editText.setHint("Input new channel name");
+        alert.setView(editText);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = editText.getText().toString().trim();
+                if (TextUtils.isEmpty(value)) {
+                    Utils.showAlert(MainActivity.this, "Your channel name is blank. Please try again!");
+                    return;
+                }
+                arrayButton[channelNumber - 1].setText(value);
+                arrayButton[channelNumber - 1].setTextSize(getResources().getDimension(R.dimen.graph_font_size));
+                mySharedPreferences.putString("channel_name_" + channelNumber, value);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
     }
 }

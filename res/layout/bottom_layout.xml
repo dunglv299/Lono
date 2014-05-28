@@ -20,6 +20,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/color_botton_disable"
                 android:text="1"
+                android:singleLine="true"
                 android:textColor="@color/white"
                 android:textSize="@dimen/main_text_large" />
 
@@ -50,6 +51,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/color_botton_disable"
                 android:text="2"
+                android:singleLine="true"
                 android:textColor="@color/white"
                 android:textSize="@dimen/main_text_large" />
 
@@ -80,6 +82,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/color_botton_disable"
                 android:text="3"
+                android:singleLine="true"
                 android:textColor="@color/white"
                 android:textSize="@dimen/main_text_large" />
 

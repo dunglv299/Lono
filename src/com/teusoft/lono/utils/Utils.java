@@ -1,5 +1,6 @@
 package com.teusoft.lono.utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ public class Utils {
     public static final long ONE_MINUTE = 60 * 1000;
     public static final long ONE_DAY = 24 * 60 * 60 * 1000;
     public static final long ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+    public static final String AUTO_CONNECT = "AUTO_CONNECT";
 
 
     public static Typeface getTypeface(Context context) {
@@ -40,11 +42,20 @@ public class Utils {
     public static int getFValue(int cValue) {
         return cValue * 9 / 5 + 32;
     }
-    public static void changeTextDegreeType(TextView mTextView, boolean isDegreeF){
-        if (isDegreeF){
+
+    public static void changeTextDegreeType(TextView mTextView, boolean isDegreeF) {
+        if (isDegreeF) {
             mTextView.setText(mTextView.getText().toString().replace("C", "F"));
-        }else{
+        } else {
             mTextView.setText(mTextView.getText().toString().replace("F", "C"));
         }
+    }
+
+    public static void showAlert(Context context, String message) {
+        new AlertDialog.Builder(context)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("OK", null)
+                .show();
     }
 }
