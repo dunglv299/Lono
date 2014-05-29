@@ -19,6 +19,7 @@ import com.teusoft.lono.activity.TemperatureActivity;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
+import com.teusoft.lono.utils.LogUtils;
 import com.teusoft.lono.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -67,6 +68,7 @@ public class WeekGraphFragment extends Fragment {
         roundStartWeek = Utils.getRoundWeek(roundStartDate);
         roundEndWeek = roundStartWeek + Utils.ONE_WEEK;
         isDegreeF = getArguments().getBoolean(Utils.DEGREE_TYPE);
+        LogUtils.e("Created week Fragment "+mPageNumber);
     }
 
     @Override
@@ -78,8 +80,7 @@ public class WeekGraphFragment extends Fragment {
         TextView pageNumberTv = (TextView) v.findViewById(R.id.pageNumber);
         if (!isDegreeF) {
             pageNumberTv.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(roundStartWeek)) + " - " + new SimpleDateFormat("dd/MM/yyyy").format(new Date(roundEndWeek - 1)));
-        }
-        else{
+        } else {
             pageNumberTv.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(roundStartWeek)) + " - " + new SimpleDateFormat("MM/dd/yyyy").format(new Date(roundEndWeek - 1)));
         }
         graphLayout = (LinearLayout) v.findViewById(R.id.graph_layout);
@@ -95,7 +96,8 @@ public class WeekGraphFragment extends Fragment {
         // Reset textview in activity
         TemperatureActivity activity = (TemperatureActivity) getActivity();
         if (activity.pageNumber == mPageNumber) {
-            activity.init(lonoList);
+            activity.initInfo(lonoList);
+            activity.isSetNowTv = true;
         }
         return v;
     }
@@ -184,5 +186,11 @@ public class WeekGraphFragment extends Fragment {
         labelX[5] = "FRI";
         labelX[6] = "SAT";
         labelX[7] = "";
+    }
+
+    public void setChangeInformation() {
+        LogUtils.e("Change for week");
+        TemperatureActivity activity = (TemperatureActivity) getActivity();
+        activity.initInfo(lonoList);
     }
 }

@@ -48,22 +48,22 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
     private Handler scanHandler;
     private BluetoothAdapter mBluetoothAdapter;
 
+    Button[] arrayButton = new Button[BUTTONS_SIZE];
+    CustomDigitalClock dc;
+    RelativeLayout progressLayout;
+    TextView scanningTextView;
+
+
     private int[] arrayButtonId = {R.id.btn1, R.id.btn2, R.id.btn3};
-    //    private int[] arrayLineId = {R.id.line_btn1, R.id.line_btn2,
-//            R.id.line_btn3};
-    private Button[] arrayButton = new Button[BUTTONS_SIZE];
-    //    private View[] arrayLine = new View[BUTTONS_SIZE];
     private ArrayList<Integer> listTemperature;
     private ArrayList<Integer> listHumidity;
     private int channel;
     private MySharedPreferences mySharedPreferences;
-    private long lastUpdate;
-    private RelativeLayout progressLayout;
     private List<String> listDevice;
     private Handler repeatHandler;
     private int mDeviceNumber;
+    private long lastUpdate;
     private LonoDao lonoDao;
-    private TextView scanningTextView;
     private MyGattServices myGattServices;
     private ToggleButton mDegreeToggle;
     private boolean isDegreeF;
@@ -149,7 +149,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
 
     public void setFont() {
         Typeface tf = Utils.getTypeface(this);
-        CustomDigitalClock dc = (CustomDigitalClock) findViewById(R.id.tv_clock);
+        dc = (CustomDigitalClock) findViewById(R.id.tv_clock);
         dc.setTypeface(tf);
 
         ((TextView) findViewById(R.id.btn1)).setTypeface(tf);
@@ -506,6 +506,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         // Is the toggle on?
         isDegreeF = ((ToggleButton) view).isChecked();
         mySharedPreferences.putBoolean(Utils.DEGREE_TYPE, isDegreeF);
+        // Change clock
+        // TODO change clock type
         // Change view in fragment
         for (int i = 0; i < 3; i++) {
             MainViewFragment fragment = (MainViewFragment) getSupportFragmentManager().findFragmentByTag(
@@ -555,6 +557,5 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         }
         return true;
     }
-
 
 }

@@ -14,7 +14,6 @@ import java.util.List;
 
 public class HumidityActivity extends TemperatureActivity implements
         OnClickListener {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +26,8 @@ public class HumidityActivity extends TemperatureActivity implements
         findViewById(R.id.dewpoint_layout).setVisibility(View.GONE);
     }
 
-    public void init(List<Lono> lonoList) {
+    @Override
+    public void initInfo(List<Lono> lonoList) {
         List<Integer> listHumidity = new ArrayList<Integer>();
         if (lonoList.size() == 0) {
             return;
@@ -36,7 +36,9 @@ public class HumidityActivity extends TemperatureActivity implements
                 listHumidity.add(lono.getHumidity());
             }
         }
-        nowTv.setText(listHumidity.get(listHumidity.size() - 1) + " %");
+        if (!isSetNowTv) {
+            nowTv.setText(listHumidity.get(listHumidity.size() - 1) + " %");
+        }
         maxValue = Collections.max(listHumidity);
         minValue = Collections.min(listHumidity);
         minTv.setText(minValue + " %");
@@ -45,12 +47,13 @@ public class HumidityActivity extends TemperatureActivity implements
     }
 
     public void resetView() {
+        isSetNowTv = false;
         nowTv.setText("-- %");
         minTv.setText("-- %");
         maxTv.setText("-- %");
         averageTv.setText("-- %");
         dewPointTv.setText("-- %");
-        mPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), 0, 0, 0, false);
-        mPager.setAdapter(mPagerAdapter);
+        mDayPagerAdapter = new DayGraphPagerAdapter(getSupportFragmentManager(), 0, 0, 0, false);
+        mPager.setAdapter(mDayPagerAdapter);
     }
 }

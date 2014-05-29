@@ -18,6 +18,7 @@ import com.teusoft.lono.activity.TemperatureActivity;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
+import com.teusoft.lono.utils.LogUtils;
 import com.teusoft.lono.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -53,6 +54,7 @@ public class DayGraphFragment extends Fragment {
         args.putLong(ROUND_STARTDATE, roundStartDate);
         args.putBoolean(Utils.DEGREE_TYPE, isDegreeF);
         fragment.setArguments(args);
+        LogUtils.e("Create " + pageNumber);
         return fragment;
     }
 
@@ -91,7 +93,8 @@ public class DayGraphFragment extends Fragment {
         // Reset textview in activity
         TemperatureActivity activity = (TemperatureActivity) getActivity();
         if (activity.pageNumber == mPageNumber) {
-            activity.init(lonoList);
+            activity.initInfo(lonoList);
+            activity.isSetNowTv = true;
         }
         return v;
     }
@@ -173,5 +176,10 @@ public class DayGraphFragment extends Fragment {
         for (int i = labelX.length - 1; i >= 0; i--) {
             labelX[i] = String.valueOf(24 - (labelX.length - i - 1) * 4) + ":00";
         }
+    }
+
+    public void setChangeInformation() {
+        TemperatureActivity activity = (TemperatureActivity) getActivity();
+        activity.initInfo(lonoList);
     }
 }
