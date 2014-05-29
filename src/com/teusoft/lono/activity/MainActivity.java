@@ -505,6 +505,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
     public void onToggleClicked(View view) {
         // Is the toggle on?
         isDegreeF = ((ToggleButton) view).isChecked();
+        // Change time type
+        if (isDegreeF){
+            dc.setIs24hMode(false);
+            dc.initClock(this);
+        }else{
+            dc.setIs24hMode(true);
+            dc.initClock(this);
+        }
         mySharedPreferences.putBoolean(Utils.DEGREE_TYPE, isDegreeF);
         // Change clock
         // TODO change clock type

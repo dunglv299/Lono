@@ -8,5 +8,7 @@
     <!-- Temperature activity -->
     <dimen name="temp_title_text">20sp</dimen>
     <dimen name="temp_normal_text">18sp</dimen>
+    <dimen name="hour_text_large">15sp</dimen>
+    <dimen name="hour_text_small">12sp</dimen>
 
 </resources>

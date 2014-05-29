@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import com.teusoft.lono.R;
 
 import java.util.Calendar;
 
@@ -21,7 +22,7 @@ import java.util.Calendar;
 public class CustomDigitalClock extends TextView {
 
 	Calendar mCalendar;
-	private final static String m12 = "h:mm:ss";
+	private final static String m12 = "h:mm:ss aa";
 	private final static String m24 = "k:mm:ss";
 	private FormatChangeObserver mFormatChangeObserver;
 
@@ -29,8 +30,10 @@ public class CustomDigitalClock extends TextView {
 	private Handler mHandler;
 
 	private boolean mTickerStopped = false;
+    private boolean is24hMode;
 
 	String mFormat;
+    private Context context;
 
 	public CustomDigitalClock(Context context) {
 		super(context);
@@ -40,10 +43,12 @@ public class CustomDigitalClock extends TextView {
 	public CustomDigitalClock(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		initClock(context);
+        this.context = context;
 	}
 
-	private void initClock(Context context) {
+	public void initClock(Context context) {
 		Resources r = context.getResources();
+        this.context = context;
 
 		if (mCalendar == null) {
 			mCalendar = Calendar.getInstance();
@@ -91,14 +96,16 @@ public class CustomDigitalClock extends TextView {
 	 */
 	private boolean get24HourMode() {
 		// return android.text.format.DateFormat.is24HourFormat(getContext());
-		return true;
+		return is24hMode;
 	}
 
 	private void setFormat() {
-		if (get24HourMode()) {
+		if (is24hMode) {
 			mFormat = m24;
-		} else {
+            this.setTextSize(context.getResources().getDimension(R.dimen.hour_text_large));
+        } else {
 			mFormat = m12;
+            this.setTextSize(context.getResources().getDimension(R.dimen.hour_text_small));
 		}
 	}
 
@@ -113,4 +120,11 @@ public class CustomDigitalClock extends TextView {
 		}
 	}
 
+    public boolean isIs24hMode() {
+        return is24hMode;
+    }
+
+    public void setIs24hMode(boolean is24hMode) {
+        this.is24hMode = is24hMode;
+    }
 }
