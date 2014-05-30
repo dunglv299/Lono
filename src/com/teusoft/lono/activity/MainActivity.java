@@ -143,7 +143,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         // Setting C/F degree
         isDegreeF = mySharedPreferences.getBoolean(Utils.DEGREE_TYPE);
         mDegreeToggle.setChecked(isDegreeF);
-
+        // Change clock format
+        dc.setIs24hMode(!isDegreeF);
+        dc.initClock(this);
     }
 
 

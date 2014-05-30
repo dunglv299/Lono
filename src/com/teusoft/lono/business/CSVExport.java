@@ -13,6 +13,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.teusoft.lono.R;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
+import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
 
 import java.io.File;
@@ -30,6 +31,7 @@ public class CSVExport {
     private LonoDao lonoDao;
     private File exportFile;
     private boolean isDegreeF;
+    private MySharedPreferences sharedPreferences;
 
     public CSVExport(Context context, LonoDao lonoDao, boolean isDegreeF) {
         this.context = context;
@@ -52,9 +54,8 @@ public class CSVExport {
         }
 
         protected Boolean doInBackground(final String... args) {
-            File dbFile = context.getDatabasePath("lono");
-            Log.e("dunglv", "Db path is: " + dbFile);  //get the path of db
             File storageDir = null;
+            sharedPreferences = new MySharedPreferences(context);
             if (Environment.MEDIA_MOUNTED.equals(Environment
                     .getExternalStorageState())) {
                 storageDir = context
@@ -134,7 +135,11 @@ public class CSVExport {
         if (timeStamp == 0l) {
             return "";
         }
-        return new SimpleDateFormat("dd/MM/yyyy hh:mm a").format(new Date(timeStamp));
+        if (sharedPreferences.getBoolean(Utils.DEGREE_TYPE)) {
+            return new SimpleDateFormat("dd/MM/yyyy hh:mm a").format(new Date(timeStamp));
+        } else {
+            return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date(timeStamp));
+        }
     }
 
     public String getTextData(int data) {
