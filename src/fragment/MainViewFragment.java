@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by DungLV on 22/5/2014.
@@ -104,16 +103,11 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
         this.listTemperature.clear();
         this.listTemperature.addAll(listTemperature);
         this.listHumidity = listHumidity;
-        setDegreeView(activity.isDegreeF());
+        setDegreeView(activity.isDegreeF(), lastUpdate);
         currentHumidityTv.setText(listHumidity.get(listHumidity.size() - 1) + " %");
         minHumidityTv.setText(Collections.min(listHumidity) + " %");
         maxHumidityTv.setText(Collections.max(listHumidity) + " %");
         setHumidityRange(listHumidity.get(listHumidity.size() - 1));
-        if (lastUpdate > 0) {
-            lastUpdatedTv.setText("Last updated,"
-                    + new SimpleDateFormat("MMM dd HH:mm:ss", Locale.US)
-                    .format(new Date(lastUpdate)));
-        }
         lastUpdatedTv.setVisibility(View.VISIBLE);
         reconnectBtn.setVisibility(View.VISIBLE);
     }
@@ -148,14 +142,14 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
         activity.overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
     }
 
-    public void setDegreeView(boolean isDegreeF) {
+    public void setDegreeView(boolean isDegreeF, long lastUpdate) {
         Utils.changeTextDegreeType(currentTempTv, isDegreeF);
         Utils.changeTextDegreeType(minTempTv, isDegreeF);
         Utils.changeTextDegreeType(maxTempTv, isDegreeF);
         if (listTemperature.size() == 0) {
             return;
         }
-        Log.e("dunglv", listTemperature.size()+"");
+        Log.e("dunglv", listTemperature.size() + "");
         int currentTemp = listTemperature.get(listTemperature.size() - 1);
         if (activity.isDegreeF()) {
             currentTempTv.setText(Utils.getFValue(currentTemp) + " °F");
@@ -165,6 +159,16 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
             currentTempTv.setText(currentTemp + " °C");
             minTempTv.setText(Collections.min(listTemperature) + " °C");
             maxTempTv.setText(Collections.max(listTemperature) + " °C");
+        }
+        // Change time type
+        if (activity.isDegreeF()) {
+            lastUpdatedTv.setText("Last updated,"
+                    + new SimpleDateFormat("MMM dd hh:mm:ss aa")
+                    .format(new Date(lastUpdate)));
+        } else {
+            lastUpdatedTv.setText("Last updated,"
+                    + new SimpleDateFormat("MMM dd HH:mm:ss")
+                    .format(new Date(lastUpdate)));
         }
     }
 }

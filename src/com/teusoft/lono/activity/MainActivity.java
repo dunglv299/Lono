@@ -523,7 +523,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
             MainViewFragment fragment = (MainViewFragment) getSupportFragmentManager().findFragmentByTag(
                     "android:switcher:" + R.id.main_view_pager + ":" + i);
             if (fragment != null) {
-                fragment.setDegreeView(isDegreeF);
+                fragment.setDegreeView(isDegreeF, lastUpdate);
             }
         }
     }
