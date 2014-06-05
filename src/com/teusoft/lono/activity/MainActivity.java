@@ -146,6 +146,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         // Change clock format
         dc.setIs24hMode(!isDegreeF);
         dc.initClock(this);
+        // Clear db when record number > 1M
+        if (lonoDao.count() > 1000 * 1000) {
+            lonoDao.deleteAll();
+        }
     }
 
 
@@ -508,10 +512,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         // Is the toggle on?
         isDegreeF = ((ToggleButton) view).isChecked();
         // Change time type
-        if (isDegreeF){
+        if (isDegreeF) {
             dc.setIs24hMode(false);
             dc.initClock(this);
-        }else{
+        } else {
             dc.setIs24hMode(true);
             dc.initClock(this);
         }
