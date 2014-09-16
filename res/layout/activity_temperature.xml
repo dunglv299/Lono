@@ -264,7 +264,7 @@
                             android:textColor="@color/black"
                             android:textSize="@dimen/temp_normal_text"
                             android:background="@null"
-                            android:text="WEEK"/>
+                            android:text="@string/week"/>
 
                     <Button
                             android:id="@+id/dayBtn"
@@ -275,7 +275,7 @@
                             android:textSize="@dimen/temp_normal_text"
                             android:background="@null"
                             android:textColor="@color/black"
-                            android:text="DAY"/>
+                            android:text="@string/day"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

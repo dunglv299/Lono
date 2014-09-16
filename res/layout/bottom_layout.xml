@@ -55,15 +55,6 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/main_text_large"/>
 
-            <!--<View-->
-                    <!--android:id="@+id/line_btn2"-->
-                    <!--android:layout_width="50dp"-->
-                    <!--android:layout_height="3dp"-->
-                    <!--android:layout_alignParentBottom="true"-->
-                    <!--android:layout_centerHorizontal="true"-->
-                    <!--android:layout_marginBottom="15dp"-->
-                    <!--android:background="@color/white"-->
-                    <!--android:visibility="gone"/>-->
         </RelativeLayout>
 
         <View
@@ -86,15 +77,6 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/main_text_large"/>
 
-            <!--<View-->
-                    <!--android:id="@+id/line_btn3"-->
-                    <!--android:layout_width="50dp"-->
-                    <!--android:layout_height="3dp"-->
-                    <!--android:layout_alignParentBottom="true"-->
-                    <!--android:layout_centerHorizontal="true"-->
-                    <!--android:layout_marginBottom="15dp"-->
-                    <!--android:background="@color/white"-->
-                    <!--android:visibility="gone"/>-->
         </RelativeLayout>
     </LinearLayout>
 

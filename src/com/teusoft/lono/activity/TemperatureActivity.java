@@ -22,7 +22,6 @@ import com.teusoft.lono.business.Sharing;
 import com.teusoft.lono.dao.Lono;
 import com.teusoft.lono.dao.LonoDao;
 import com.teusoft.lono.dao.MyDatabaseHelper;
-import com.teusoft.lono.utils.LogUtils;
 import com.teusoft.lono.utils.MySharedPreferences;
 import com.teusoft.lono.utils.Utils;
 import fragment.DayGraphFragment;
@@ -363,16 +362,16 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
     public static void showEditChannelDialog(final Context context, final Button[] arrayButton,
                                              final MySharedPreferences mySharedPreferences, final int channelNumber) {
         final AlertDialog.Builder alert = new AlertDialog.Builder(context);
-        alert.setTitle("Rename channel " + channelNumber);
+        alert.setTitle(context.getString(R.string.rename_channel) + " " + channelNumber);
         // Set an EditText view to get user input
         final EditText editText = new EditText(context);
-        editText.setHint("Input new channel name");
+        editText.setHint(context.getString(R.string.input_channel_name));
         alert.setView(editText);
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String value = channelNumber + "\n" + editText.getText().toString().trim();
                 if (TextUtils.isEmpty(value)) {
-                    Utils.showAlert(context, "Your channel name is blank. Please try again!");
+                    Utils.showAlert(context, context.getString(R.string.blank_channel));
                     return;
                 }
                 arrayButton[channelNumber - 1].setText(value);
@@ -381,7 +380,7 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Canceled.
             }
@@ -398,7 +397,6 @@ public class TemperatureActivity extends FragmentActivity implements OnClickList
 
     @Override
     public void onPageSelected(int position) {
-        LogUtils.e("position " + position);
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(
                 "android:switcher:" + R.id.view_pager + ":" + position);
         if (fragment != null) {

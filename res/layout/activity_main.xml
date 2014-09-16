@@ -31,7 +31,7 @@
                 android:id="@+id/exportBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Export"
+                android:text="@string/export"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
                 android:layout_alignParentRight="true"
@@ -84,7 +84,7 @@
                     android:layout_below="@+id/progress_bar"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="10dp"
-                    android:text="Scanning"
+                    android:text="@string/scanning"
                     android:textColor="@color/white"
                     android:textSize="12sp"/>
         </RelativeLayout>

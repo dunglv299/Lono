@@ -146,8 +146,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
         // Change clock format
         dc.setIs24hMode(!isDegreeF);
         dc.initClock(this);
-        // Clear db when record number > 1M
-        if (lonoDao.count() > 1000 * 1000) {
+        // Clear db when record number > 200k
+        if (lonoDao.count() > 200 * 1000) {
             lonoDao.deleteAll();
         }
     }
@@ -292,7 +292,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
                 mConnected = true;
                 myGattServices.displayGattServices(mBluetoothLeService
                         .getSupportedGattServices());
-                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.connected), Toast.LENGTH_SHORT).show();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 int indexArray = intent.getIntExtra(
                         BluetoothLeService.EXTRA_COUNT, 0);
@@ -304,7 +304,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
                         0);
                 int type = intent.getIntExtra(BluetoothLeService.EXTRA_TYPE, 0);
                 // Loading data
-                scanningTextView.setText("Loading data");
+                scanningTextView.setText(getString(R.string.loading_data));
                 listTemperature.add(temperature);
                 listHumidity.add(humidity);
                 if (type == 0 && indexArray == 1) {
@@ -332,7 +332,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
 
     public void reconnect() {
         progressLayout.setVisibility(View.VISIBLE);
-        scanningTextView.setText("Reconnect...");
+        scanningTextView.setText(getString(R.string.reconnecting));
         mDeviceAddress = addressArray[channel - 1];
         Intent gattServiceIntent = new Intent(MainActivity.this,
                 BluetoothLeService.class);
@@ -343,7 +343,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, V
                              ArrayList<Integer> listHumidity, long lastUpdate) {
         LogUtils.e("display Data");
         showLine(arrayButtonId[channel - 1]);
-        scanningTextView.setText("Scanning");
+        scanningTextView.setText(getString(R.string.scanning));
         MainViewFragment fragment = getActiveFragment();
         if (fragment != null) {
             fragment.updateDisplay(listTemperature, listHumidity, lastUpdate);

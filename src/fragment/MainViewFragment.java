@@ -162,11 +162,11 @@ public class MainViewFragment extends BaseFragment implements View.OnClickListen
         }
         // Change time type
         if (activity.isDegreeF()) {
-            lastUpdatedTv.setText("Last updated,"
+            lastUpdatedTv.setText(getString(R.string.last_updated) + ","
                     + new SimpleDateFormat("MMM dd hh:mm:ss aa")
                     .format(new Date(lastUpdate)));
         } else {
-            lastUpdatedTv.setText("Last updated,"
+            lastUpdatedTv.setText(getString(R.string.last_updated) + ","
                     + new SimpleDateFormat("MMM dd HH:mm:ss")
                     .format(new Date(lastUpdate)));
         }
